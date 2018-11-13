@@ -14,5 +14,8 @@
     <string name="choose_what_you_want_to_do">Choose what you want to do</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+
+    <!--Questions-->
+    <string name="are_you_sure_question">Are you sure?</string>
     <string name="are_you_sure_you_want_to_log_out_question">Are you sure you want to log out?</string>
 </resources>

@@ -15,18 +15,24 @@ class DecisionDialog : DialogFragment() {
 	var button1text: String? = null
 	var button2text: String? = null
 
-	var onButton1Click: () -> Unit = {}
-	var onButton2Click: () -> Unit = {}
+	var onButton1Click: () -> Unit = { dismiss() }
+	var onButton2Click: () -> Unit = { dismiss() }
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-		val binding = DataBindingUtil.inflate<DialogDecisionBinding>(inflater, R.layout.dialog_decision, container, false).apply {
-			setLifecycleOwner(this@DecisionDialog)
-			title = this@DecisionDialog.title
-			button1text = this@DecisionDialog.button1text
-			button2text = this@DecisionDialog.button2text
-			onButton1Click = this@DecisionDialog.onButton1Click
-			onButton2Click = this@DecisionDialog.onButton2Click
-		}
-		return binding.root
+		attemptSettingDefaultTexts()
+		return DataBindingUtil.inflate<DialogDecisionBinding>(inflater, R.layout.dialog_decision, container, false).also {
+			it.setLifecycleOwner(this)
+			it.title = title
+			it.button1text = button1text
+			it.button2text = button2text
+			it.onButton1Click = onButton1Click
+			it.onButton2Click = onButton2Click
+		}.root
+	}
+
+	private fun attemptSettingDefaultTexts() {
+		if (title == null) title = getString(R.string.are_you_sure_question)
+		if (button1text == null) button1text = getString(R.string.yes)
+		if (button2text == null) button2text = getString(R.string.no)
 	}
 }

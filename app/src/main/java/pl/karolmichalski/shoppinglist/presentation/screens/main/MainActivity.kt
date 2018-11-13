@@ -93,11 +93,10 @@ class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callba
 	}
 
 	private fun showLogoutDecisionDialog() {
-		val dialog = DecisionDialog()
-		dialog.title = getString(R.string.are_you_sure_you_want_to_log_out_question)
-		dialog.onButton1Click = { logout() }
-		dialog.onButton2Click = { dialog.dismiss() }
-		dialog.show(supportFragmentManager, dialog.javaClass.simpleName)
+		DecisionDialog().also {
+			it.title = getString(R.string.are_you_sure_you_want_to_log_out_question)
+			it.onButton1Click = { logout() }
+		}.show(supportFragmentManager, DecisionDialog::class.java.simpleName)
 	}
 
 	private fun logout() {

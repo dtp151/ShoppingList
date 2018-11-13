@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:text="@{title ?? @string/choose_what_you_want_to_do}"
+            android:text="@{title}"
             tools:text="@string/choose_what_you_want_to_do" />
 
         <Button
@@ -44,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{()->onButton1Click.invoke()}"
-            android:text="@{button1text ?? @string/yes}"
+            android:text="@{button1text}"
             app:layout_constraintEnd_toStartOf="@id/button2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/titleTV"
@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{()->onButton2Click.invoke()}"
-            android:text="@{button2text ?? @string/no}"
+            android:text="@{button2text}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/button1"
             app:layout_constraintTop_toTopOf="@id/button1"
