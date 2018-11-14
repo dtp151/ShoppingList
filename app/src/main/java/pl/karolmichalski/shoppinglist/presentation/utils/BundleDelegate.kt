@@ -18,12 +18,12 @@ sealed class BundleDelegate<T>(protected val key: kotlin.String) : ReadWriteProp
 	}
 
 	class String(key: kotlin.String) : BundleDelegate<kotlin.String>(key) {
-		override fun getValue(thisRef: Bundle, property: KProperty<*>): kotlin.String {
-			return thisRef.getString(key) ?: ""
-		}
-
 		override fun setValue(thisRef: Bundle, property: KProperty<*>, value: kotlin.String) {
 			thisRef.putString(key, value)
+		}
+
+		override fun getValue(thisRef: Bundle, property: KProperty<*>): kotlin.String {
+			return thisRef.getString(key) ?: ""
 		}
 	}
 }

@@ -19,6 +19,7 @@ import pl.karolmichalski.shoppinglist.presentation.utils.BundleDelegate
 class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callback {
 
 	private var Bundle.selectedProducts by BundleDelegate.HashSet<String>("selected_products")
+	private var Bundle.newProductName by BundleDelegate.String("new_product_name")
 
 	private val viewModel by lazy {
 		ViewModelProviders.of(this, MainViewModel.Factory(application)).get(MainViewModel::class.java)
@@ -27,7 +28,6 @@ class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callba
 	private val actionModeManager by lazy {
 		ActionModeManager(this)
 	}
-
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -55,20 +55,22 @@ class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callba
 	override fun onSaveInstanceState(outState: Bundle?) {
 		super.onSaveInstanceState(outState)
 		outState?.selectedProducts = viewModel.selectedProducts
+		viewModel.newProductName.value?.let { outState?.newProductName = it }
 	}
 
 	override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
 		super.onRestoreInstanceState(savedInstanceState)
-		savedInstanceState?.selectedProducts?.let {
-			viewModel.selectedProducts.addAll(it)
+		savedInstanceState?.let {
+			viewModel.selectedProducts.addAll(it.selectedProducts)
+			viewModel.newProductName.value = it.newProductName
 		}
 	}
 
 	override fun onAddBtnClick() {
-		viewModel.productName.value?.let { name ->
+		viewModel.newProductName.value?.let { name ->
 			viewModel.addProduct(name)
 		}
-		viewModel.clearProductName()
+		viewModel.clearNewProductName()
 	}
 
 	override fun onProductClick(): (Product) -> Unit {

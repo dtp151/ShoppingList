@@ -17,7 +17,7 @@ class MainViewModel(app: App) : ViewModel() {
 		}
 	}
 
-	val productName = MutableLiveData<String>()
+	val newProductName = MutableLiveData<String>()
 
 	val productList = MutableLiveData<List<Product>>().apply { value = ArrayList() }
 
@@ -70,8 +70,8 @@ class MainViewModel(app: App) : ViewModel() {
 		}
 	}
 
-	fun clearProductName() {
-		productName.value = ""
+	fun clearNewProductName() {
+		newProductName.value = ""
 	}
 
 	fun logOut() {
