@@ -42,13 +42,21 @@ class ProductRepositoryImpl(
 	}
 
 	override fun delete(product: Product) {
-		Completable.fromAction { localDatabase.delete(product) }
-				.andThen(cloudDatabase.delete(product))
+		product.status = Product.Status.DELETED
+		cloudDatabase.delete(product)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribeBy(
-						onComplete = { Log.d("awda", "awdaw") },
-						onError = { Log.d("awda", "awdaw") }
+						onComplete = {
+							Completable.fromAction { localDatabase.delete(product) }
+									.subscribeOn(Schedulers.io())
+									.observeOn(AndroidSchedulers.mainThread())
+									.subscribe()
+
+						},
+						onError = {
+							Log.d("awdaw", "awdawdaw")
+						}
 				)
 	}
 }
