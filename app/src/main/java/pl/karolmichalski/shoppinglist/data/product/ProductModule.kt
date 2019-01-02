@@ -2,16 +2,26 @@ package pl.karolmichalski.shoppinglist.data.product
 
 import android.content.Context
 import androidx.room.Room
-import com.google.firebase.database.FirebaseDatabase
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import dagger.Module
 import dagger.Provides
-import pl.karolmichalski.shoppinglist.data.product.cloud.CloudDatabase
-import pl.karolmichalski.shoppinglist.data.product.cloud.CloudDatabaseImpl
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import pl.karolmichalski.shoppinglist.BuildConfig
+import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterface
+import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterfaceWrapper
+import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterfaceWrapperImpl
 import pl.karolmichalski.shoppinglist.data.product.local.LocalDatabase
 import pl.karolmichalski.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.karolmichalski.shoppinglist.domain.product.ProductRepository
-import javax.inject.Named
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.jackson.JacksonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Singleton
+
+private const val API_URL = "https://us-central1-shoppinglist-4fa3b.cloudfunctions.net/"
 
 @Module
 class ProductModule(private val context: Context) {
@@ -19,14 +29,13 @@ class ProductModule(private val context: Context) {
 	@Provides
 	@Singleton
 	fun provideProductsRepository(
-			@Named("localDatabase") localDatabase: LocalDatabaseDAO,
-			@Named("cloudDatabase") cloudDatabase: CloudDatabase): ProductRepository {
-		return ProductRepositoryImpl(localDatabase, cloudDatabase)
+			localDatabase: LocalDatabaseDAO,
+			cloudInterfaceWrapper: CloudInterfaceWrapper): ProductRepository {
+		return ProductRepositoryImpl(localDatabase, cloudInterfaceWrapper)
 	}
 
 	@Provides
 	@Singleton
-	@Named("localDatabase")
 	fun provideLocalDatabase(): LocalDatabaseDAO {
 		val database = Room.databaseBuilder(context.applicationContext, LocalDatabase::class.java, "shopping.db")
 				.fallbackToDestructiveMigration()
@@ -36,9 +45,33 @@ class ProductModule(private val context: Context) {
 
 	@Provides
 	@Singleton
-	@Named("cloudDatabase")
-	fun provideCloudDatabase(): CloudDatabase {
-		return CloudDatabaseImpl(FirebaseDatabase.getInstance())
+	fun provideCloudInterfaceWrapper(cloudInterface: CloudInterface): CloudInterfaceWrapper {
+		return CloudInterfaceWrapperImpl(cloudInterface)
+	}
+
+	@Provides
+	@Singleton
+	fun provideCloudInterface(): CloudInterface {
+		val loggingInterceptor = HttpLoggingInterceptor().apply {
+			level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+		}
+
+		val okHttpClient = OkHttpClient.Builder()
+				.addInterceptor(loggingInterceptor)
+				.build()
+
+		val objectMapper = ObjectMapper()
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+		val retrofit = Retrofit.Builder()
+				.baseUrl(API_URL)
+				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+				.client(okHttpClient)
+				.addConverterFactory(ScalarsConverterFactory.create())
+				.addConverterFactory(JacksonConverterFactory.create(objectMapper))
+				.build()
+
+		return retrofit.create(CloudInterface::class.java)
 	}
 
 }

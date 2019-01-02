@@ -1,12 +1,12 @@
 package pl.karolmichalski.shoppinglist.presentation
 
-import android.app.Application
+import androidx.multidex.MultiDexApplication
 import pl.karolmichalski.shoppinglist.data.product.ProductModule
 import pl.karolmichalski.shoppinglist.data.user.UserModule
-import pl.karolmichalski.shoppinglist.domain.AppComponent
-import pl.karolmichalski.shoppinglist.domain.DaggerAppComponent
+import pl.karolmichalski.shoppinglist.di.AppComponent
+import pl.karolmichalski.shoppinglist.di.DaggerAppComponent
 
-class App : Application() {
+class App : MultiDexApplication() {
 
 	val appComponent: AppComponent by lazy {
 		DaggerAppComponent.builder()

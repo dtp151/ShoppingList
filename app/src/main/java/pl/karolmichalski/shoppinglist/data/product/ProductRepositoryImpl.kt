@@ -2,36 +2,49 @@ package pl.karolmichalski.shoppinglist.data.product
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import pl.karolmichalski.shoppinglist.data.models.Product
-import pl.karolmichalski.shoppinglist.data.product.cloud.CloudDatabase
+import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterfaceWrapper
 import pl.karolmichalski.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.karolmichalski.shoppinglist.domain.product.ProductRepository
 
 class ProductRepositoryImpl(
 		private val localDatabase: LocalDatabaseDAO,
-		private val cloudDatabase: CloudDatabase) : ProductRepository {
+		private val cloudInterfaceWrapper: CloudInterfaceWrapper)
+	: ProductRepository {
 
 	override fun getAll(): LiveData<List<Product>> {
 		return localDatabase.getAll()
 	}
 
 	override fun insert(name: String) {
-		cloudDatabase.generateKey()?.let { key ->
-			val product = Product(key, name, Product.Status.ADDED)
-			Completable.fromAction { localDatabase.insert(product) }
-					.andThen(cloudDatabase.insert(product))
-					.subscribeOn(Schedulers.io())
-					.observeOn(Schedulers.io())
-					.subscribeBy(onComplete = {
-						product.status = Product.Status.SYNCED
-						localDatabase.update(product)
-					})
-		}
+		cloudInterfaceWrapper.generateProductKey(FirebaseAuth.getInstance().currentUser!!.uid)
+				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
+				.subscribeBy(
+						onSuccess = {key ->
+							val product = Product(key, name, Product.Status.ADDED)
+							Completable.fromAction { localDatabase.insert(product) }
+									.andThen(cloudInterfaceWrapper.addProduct(FirebaseAuth.getInstance().currentUser!!.uid, product.key, product.name))
+									.subscribeBy(
+											onSuccess = {
+												product.status = Product.Status.SYNCED
+												localDatabase.update(product)
+											},
+											onError = {
+												Log.d("adaw", "wadawdaw")
+											}
+									)
 
+						},
+						onError = {
+							Log.d("adaw", "wadawdaw")
+						}
+				)
 	}
 
 	override fun update(product: Product) {
@@ -43,14 +56,12 @@ class ProductRepositoryImpl(
 
 	override fun delete(product: Product) {
 		product.status = Product.Status.DELETED
-		cloudDatabase.delete(product)
+		cloudInterfaceWrapper.deleteProduct(FirebaseAuth.getInstance().currentUser!!.uid, product.key)
 				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
+				.observeOn(Schedulers.io())
 				.subscribeBy(
-						onComplete = {
+						onSuccess = {
 							Completable.fromAction { localDatabase.delete(product) }
-									.subscribeOn(Schedulers.io())
-									.observeOn(AndroidSchedulers.mainThread())
 									.subscribe()
 
 						},
