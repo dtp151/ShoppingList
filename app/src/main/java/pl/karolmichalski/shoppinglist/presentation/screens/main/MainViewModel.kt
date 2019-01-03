@@ -34,9 +34,9 @@ class MainViewModel(app: App) : ViewModel() {
 	}
 
 	fun getProducts(owner: LifecycleOwner) {
-		productRepository.getAll().observe(owner, Observer { savedProductList ->
-			savedProductList?.map { it.isChecked = selectedProducts.contains(it.key) }
-			productList.value = savedProductList
+		productRepository.getAll().observe(owner, Observer { list ->
+			productList.value = list?.filter { it.status != Product.Status.DELETED }
+					.apply { this?.map { it.isChecked = selectedProducts.contains(it.key)  } }
 		})
 	}
 
@@ -75,7 +75,7 @@ class MainViewModel(app: App) : ViewModel() {
 	}
 
 	fun logOut() {
-		 userRepository.logOut()
+		userRepository.logOut()
 	}
 
 }

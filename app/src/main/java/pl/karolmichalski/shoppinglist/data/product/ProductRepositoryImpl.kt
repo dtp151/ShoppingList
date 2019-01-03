@@ -56,18 +56,27 @@ class ProductRepositoryImpl(
 
 	override fun delete(product: Product) {
 		product.status = Product.Status.DELETED
-		cloudInterfaceWrapper.deleteProduct(FirebaseAuth.getInstance().currentUser!!.uid, product.key)
+		Completable.fromAction { localDatabase.update(product) }
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
 				.subscribeBy(
-						onSuccess = {
-							Completable.fromAction { localDatabase.delete(product) }
-									.subscribe()
+						onComplete = {
+							cloudInterfaceWrapper.deleteProduct(FirebaseAuth.getInstance().currentUser!!.uid, product.key)
+									.subscribeBy(
+											onSuccess = {
+												Completable.fromAction { localDatabase.delete(product) }
+														.subscribe()
 
+											},
+											onError = {
+												Log.d("awdaw", "awdawdaw")
+											}
+									)
 						},
 						onError = {
 							Log.d("awdaw", "awdawdaw")
 						}
 				)
+
 	}
 }
