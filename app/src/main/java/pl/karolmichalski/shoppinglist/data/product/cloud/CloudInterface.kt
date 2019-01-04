@@ -1,10 +1,8 @@
 package pl.karolmichalski.shoppinglist.data.product.cloud
 
 import io.reactivex.Single
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.Query
+import pl.karolmichalski.shoppinglist.data.models.Product
+import retrofit2.http.*
 
 interface CloudInterface {
 
@@ -21,5 +19,10 @@ interface CloudInterface {
 	@POST("deleteProduct")
 	fun deleteProduct(@Header("uid") uid: String,
 					  @Query("key") key: String)
+			: Single<Boolean>
+
+	@POST("synchronizeProducts")
+	fun synchronizeProducts(@Header("uid") uid: String,
+							@Body products: List<Product>)
 			: Single<Boolean>
 }

@@ -12,4 +12,6 @@ interface ProductRepository {
 	fun update(product: Product)
 
 	fun delete(product: Product)
+
+	fun synchronize(productList: List<Product>?)
 }

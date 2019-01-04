@@ -6,6 +6,7 @@ import pl.karolmichalski.shoppinglist.data.models.Product
 import pl.karolmichalski.shoppinglist.domain.product.ProductRepository
 import pl.karolmichalski.shoppinglist.domain.user.UserRepository
 import pl.karolmichalski.shoppinglist.presentation.App
+import pl.karolmichalski.shoppinglist.presentation.utils.observeOnce
 import javax.inject.Inject
 
 class MainViewModel(app: App) : ViewModel() {
@@ -42,6 +43,12 @@ class MainViewModel(app: App) : ViewModel() {
 
 	fun addProduct(name: String) {
 		productRepository.insert(name)
+	}
+
+	fun synchronizeProducts(owner: LifecycleOwner) {
+		productRepository.getAll().observeOnce(owner, Observer {
+			productRepository.synchronize(it)
+		})
 	}
 
 	fun invalidateProductSelection(product: Product) {

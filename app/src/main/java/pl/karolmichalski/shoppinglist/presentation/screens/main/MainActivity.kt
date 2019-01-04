@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import pl.karolmichalski.shoppinglist.R
 import pl.karolmichalski.shoppinglist.data.models.Product
 import pl.karolmichalski.shoppinglist.databinding.ActivityMainBinding
@@ -16,7 +17,7 @@ import pl.karolmichalski.shoppinglist.presentation.screens.login.LoginActivity
 import pl.karolmichalski.shoppinglist.presentation.utils.ActionModeManager
 import pl.karolmichalski.shoppinglist.presentation.utils.BundleDelegate
 
-class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callback {
+class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callback, SwipeRefreshLayout.OnRefreshListener {
 
 	private var Bundle.selectedProducts by BundleDelegate.HashSet<String>("selected_products")
 	private var Bundle.newProductName by BundleDelegate.String("new_product_name")
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callba
 			setLifecycleOwner(this@MainActivity)
 			viewModel = this@MainActivity.viewModel
 			listener = this@MainActivity
+			onRefreshListener = this@MainActivity
 		}
 		viewModel.getProducts(this)
 	}
@@ -92,6 +94,10 @@ class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callba
 	override fun onActionModeDestroyed() {
 		viewModel.deselectAllProducts()
 		viewModel.productList.value = viewModel.productList.value
+	}
+
+	override fun onRefresh() {
+		viewModel.synchronizeProducts(this)
 	}
 
 	private fun showLogoutDecisionDialog() {

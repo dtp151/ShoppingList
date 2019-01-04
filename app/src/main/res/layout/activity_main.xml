@@ -13,6 +13,10 @@
             name="listener"
             type="pl.karolmichalski.shoppinglist.presentation.screens.main.MainListener" />
 
+        <variable
+            name="onRefreshListener"
+            type="androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener" />
+
     </data>
 
     <LinearLayout
@@ -21,16 +25,23 @@
         android:orientation="vertical"
         tools:context=".presentation.screens.main.MainActivity">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:onItemClick="@{listener.onProductClick()}"
-            app:productList="@{viewModel.productList}"
-            app:reverseLayout="true"
-            app:stackFromEnd="true"
-            tools:listitem="@layout/item_product" />
+            app:onRefreshListener="@{onRefreshListener}">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:onItemClick="@{listener.onProductClick()}"
+                app:productList="@{viewModel.productList}"
+                app:reverseLayout="true"
+                app:stackFromEnd="true"
+                tools:listitem="@layout/item_product" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

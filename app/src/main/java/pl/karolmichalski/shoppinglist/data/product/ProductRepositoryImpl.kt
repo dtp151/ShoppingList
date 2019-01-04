@@ -79,4 +79,20 @@ class ProductRepositoryImpl(
 				)
 
 	}
+
+	override fun synchronize(productList: List<Product>?) {
+		cloudInterfaceWrapper.synchronizeProducts(FirebaseAuth.getInstance().currentUser!!.uid, productList)
+				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
+				.subscribeBy(
+						onSuccess = {
+							Log.d("awdaw0", "awdad")
+
+						},
+						onError = {
+							Log.d("adaw", "wadawdaw")
+						}
+				)
+	}
+
 }
