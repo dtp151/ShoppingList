@@ -12,7 +12,7 @@ interface LocalDatabaseDAO {
 	fun getAll(): LiveData<List<Product>>
 
 	@Insert(onConflict = REPLACE)
-	fun insert(product: Product)
+	fun insert(product: Product): Long
 
 	@Update
 	fun update(product: Product)

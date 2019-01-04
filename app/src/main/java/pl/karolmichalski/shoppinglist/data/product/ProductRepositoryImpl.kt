@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -22,29 +23,29 @@ class ProductRepositoryImpl(
 	}
 
 	override fun insert(name: String) {
-		cloudInterfaceWrapper.generateProductKey(FirebaseAuth.getInstance().currentUser!!.uid)
+		val product = Product(name, Product.Status.ADDED)
+		Single.fromCallable { localDatabase.insert(product) }
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
 				.subscribeBy(
-						onSuccess = {key ->
-							val product = Product(key, name, Product.Status.ADDED)
-							Completable.fromAction { localDatabase.insert(product) }
-									.andThen(cloudInterfaceWrapper.addProduct(FirebaseAuth.getInstance().currentUser!!.uid, product.key, product.name))
+						onSuccess = { productId ->
+							cloudInterfaceWrapper.addProduct(FirebaseAuth.getInstance().currentUser!!.uid, productId.toInt(), product.name)
 									.subscribeBy(
 											onSuccess = {
 												product.status = Product.Status.SYNCED
 												localDatabase.update(product)
 											},
 											onError = {
-												Log.d("adaw", "wadawdaw")
-											}
-									)
+
+											})
+
 
 						},
 						onError = {
 							Log.d("adaw", "wadawdaw")
 						}
 				)
+
 	}
 
 	override fun update(product: Product) {
@@ -61,7 +62,7 @@ class ProductRepositoryImpl(
 				.observeOn(Schedulers.io())
 				.subscribeBy(
 						onComplete = {
-							cloudInterfaceWrapper.deleteProduct(FirebaseAuth.getInstance().currentUser!!.uid, product.key)
+							cloudInterfaceWrapper.deleteProduct(FirebaseAuth.getInstance().currentUser!!.uid, product.id)
 									.subscribeBy(
 											onSuccess = {
 												Completable.fromAction { localDatabase.delete(product) }
