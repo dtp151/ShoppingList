@@ -36,7 +36,7 @@ class MainViewModel(app: App) : ViewModel() {
 	fun getProducts(owner: LifecycleOwner) {
 		productRepository.getAll().observe(owner, Observer { list ->
 			productList.value = list?.filter { it.status != Product.Status.DELETED }
-					.apply { this?.map { it.isChecked = selectedProducts.contains(it.key)  } }
+					.apply { this?.map { it.isChecked = selectedProducts.contains(it.key) } }
 		})
 	}
 
