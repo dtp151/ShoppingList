@@ -13,5 +13,5 @@ interface ProductRepository {
 
 	fun delete(product: Product)
 
-	fun synchronize(productList: List<Product>?)
+	fun synchronize(productList: List<Product>?, doFinally: () -> Unit)
 }

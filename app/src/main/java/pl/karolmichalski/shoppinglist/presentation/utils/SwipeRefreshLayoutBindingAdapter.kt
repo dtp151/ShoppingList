@@ -7,3 +7,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 fun SwipeRefreshLayout.setOnRefreshListener(onRefreshListener: SwipeRefreshLayout.OnRefreshListener) {
 	setOnRefreshListener(onRefreshListener)
 }
+
+@BindingAdapter("isRefreshing")
+fun SwipeRefreshLayout.setIsRefreshing(isRefreshing: Boolean) {
+	setRefreshing(isRefreshing)
+}

@@ -24,6 +24,8 @@ class MainViewModel(app: App) : ViewModel() {
 
 	val selectedProducts = HashSet<Int>()
 
+	val isRefreshing = MutableLiveData<Boolean>().apply { value = false }
+
 	@Inject
 	lateinit var productRepository: ProductRepository
 
@@ -46,8 +48,9 @@ class MainViewModel(app: App) : ViewModel() {
 	}
 
 	fun synchronizeProducts(owner: LifecycleOwner) {
-		productRepository.getAll().observeOnce(owner, Observer {
-			productRepository.synchronize(it)
+		productRepository.getAll().observeOnce(owner, Observer { productList ->
+			productRepository.synchronize(productList,
+					doFinally = { isRefreshing.value = false })
 		})
 	}
 
