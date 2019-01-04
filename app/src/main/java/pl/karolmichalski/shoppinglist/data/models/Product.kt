@@ -8,15 +8,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 
 @Entity(tableName = "products")
-class Product(@ColumnInfo(name = "name")
+class Product(@ColumnInfo(name = "id")
+			  @JsonProperty("id")
+			  @PrimaryKey()
+			  var id: Long = 0,
+			  @ColumnInfo(name = "name")
 			  @JsonProperty("name")
 			  val name: String,
 			  @ColumnInfo(name = "status")
 			  @JsonProperty("status")
 			  var status: Int) {
-	@PrimaryKey(autoGenerate = true)
-	@JsonProperty("id")
-	var id: Int = 0
 	@Ignore
 	@get:JsonIgnore
 	var isChecked: Boolean = false

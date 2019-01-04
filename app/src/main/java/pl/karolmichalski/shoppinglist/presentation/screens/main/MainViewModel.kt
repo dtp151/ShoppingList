@@ -22,7 +22,7 @@ class MainViewModel(app: App) : ViewModel() {
 
 	val productList = MutableLiveData<List<Product>>().apply { value = ArrayList() }
 
-	val selectedProducts = HashSet<Int>()
+	val selectedProducts = HashSet<Long>()
 
 	val isRefreshing = MutableLiveData<Boolean>().apply { value = false }
 
@@ -37,6 +37,7 @@ class MainViewModel(app: App) : ViewModel() {
 	}
 
 	fun getProducts(owner: LifecycleOwner) {
+		synchronizeProducts(owner)
 		productRepository.getAll().observe(owner, Observer { list ->
 			productList.value = list?.filter { it.status != Product.Status.DELETED }
 					.apply { this?.map { it.isChecked = selectedProducts.contains(it.id) } }
@@ -50,7 +51,7 @@ class MainViewModel(app: App) : ViewModel() {
 	fun synchronizeProducts(owner: LifecycleOwner) {
 		productRepository.getAll().observeOnce(owner, Observer { productList ->
 			productRepository.synchronize(productList,
-					doFinally = { isRefreshing.value = false })
+					doFinally = { isRefreshing.postValue(false) })
 		})
 	}
 
@@ -85,7 +86,7 @@ class MainViewModel(app: App) : ViewModel() {
 	}
 
 	fun logOut() {
+		productRepository.clearDatabase()
 		userRepository.logOut()
 	}
-
 }

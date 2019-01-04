@@ -11,17 +11,17 @@ interface CloudInterface {
 
 	@POST("addProduct")
 	fun addProduct(@Header("uid") uid: String,
-				   @Query("id") id: Int,
+				   @Query("id") id: Long,
 				   @Query("name") name: String)
 			: Single<String>
 
 	@POST("deleteProduct")
 	fun deleteProduct(@Header("uid") uid: String,
-					  @Query("id") id: Int)
+					  @Query("id") id: Long)
 			: Single<Boolean>
 
 	@POST("synchronizeProducts")
 	fun synchronizeProducts(@Header("uid") uid: String,
 							@Body products: List<Product>)
-			: Single<Boolean>
+			: Single<List<Product>>
 }

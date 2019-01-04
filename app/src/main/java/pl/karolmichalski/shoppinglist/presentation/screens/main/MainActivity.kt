@@ -19,7 +19,7 @@ import pl.karolmichalski.shoppinglist.presentation.utils.BundleDelegate
 
 class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callback, SwipeRefreshLayout.OnRefreshListener {
 
-	private var Bundle.selectedProducts by BundleDelegate.HashSet<Int>("selected_products")
+	private var Bundle.selectedProducts by BundleDelegate.HashSet<Long>("selected_products")
 	private var Bundle.newProductName by BundleDelegate.String("new_product_name")
 
 	private val viewModel by lazy {

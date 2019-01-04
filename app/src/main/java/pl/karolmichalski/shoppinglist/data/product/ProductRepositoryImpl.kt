@@ -12,6 +12,7 @@ import pl.karolmichalski.shoppinglist.data.models.Product
 import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterfaceWrapper
 import pl.karolmichalski.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.karolmichalski.shoppinglist.domain.product.ProductRepository
+import pl.karolmichalski.shoppinglist.presentation.utils.getTimeStamp
 
 class ProductRepositoryImpl(
 		private val localDatabase: LocalDatabaseDAO,
@@ -23,13 +24,13 @@ class ProductRepositoryImpl(
 	}
 
 	override fun insert(name: String) {
-		val product = Product(name, Product.Status.ADDED)
+		val product = Product(getTimeStamp(), name, Product.Status.ADDED)
 		Single.fromCallable { localDatabase.insert(product) }
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
 				.subscribeBy(
 						onSuccess = { productId ->
-							cloudInterfaceWrapper.addProduct(FirebaseAuth.getInstance().currentUser!!.uid, productId.toInt(), product.name)
+							cloudInterfaceWrapper.addProduct(FirebaseAuth.getInstance().currentUser!!.uid, productId, product.name)
 									.subscribeBy(
 											onSuccess = {
 												product.status = Product.Status.SYNCED
@@ -65,8 +66,7 @@ class ProductRepositoryImpl(
 							cloudInterfaceWrapper.deleteProduct(FirebaseAuth.getInstance().currentUser!!.uid, product.id)
 									.subscribeBy(
 											onSuccess = {
-												Completable.fromAction { localDatabase.delete(product) }
-														.subscribe()
+												removeProductLocally(product)
 
 											},
 											onError = {
@@ -81,19 +81,34 @@ class ProductRepositoryImpl(
 
 	}
 
+	override fun clearDatabase() {
+		Completable.fromAction { localDatabase.deleteAll() }
+				.subscribeOn(Schedulers.io())
+				.subscribe()
+	}
+
 	override fun synchronize(productList: List<Product>?, doFinally: () -> Unit) {
 		cloudInterfaceWrapper.synchronizeProducts(FirebaseAuth.getInstance().currentUser!!.uid, productList)
 				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
+				.observeOn(Schedulers.io())
 				.doFinally { doFinally() }
 				.subscribeBy(
 						onSuccess = {
-
+							it.map { it.status = Product.Status.SYNCED }
+							localDatabase.deleteAll()
+							localDatabase.insertProducts(it)
 						},
 						onError = {
 
 						}
 				)
+	}
+
+	private fun removeProductLocally(product: Product) {
+		Completable
+				.fromAction { localDatabase.delete(product) }
+				.subscribeOn(Schedulers.io())
+				.subscribe()
 	}
 
 }

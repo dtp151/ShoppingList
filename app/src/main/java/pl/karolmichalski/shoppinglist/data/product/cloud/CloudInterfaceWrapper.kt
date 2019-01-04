@@ -6,15 +6,15 @@ import pl.karolmichalski.shoppinglist.data.models.Product
 interface CloudInterfaceWrapper {
 
 	fun addProduct(uid: String,
-				   id: Int,
+				   id: Long,
 				   name: String)
 			: Single<String>
 
 	fun deleteProduct(uid: String,
-					  id: Int)
+					  id: Long)
 			: Single<Boolean>
 
 	fun synchronizeProducts(uid: String,
 							products: List<Product>?)
-			: Single<Boolean>
+			: Single<List<Product>>
 }
