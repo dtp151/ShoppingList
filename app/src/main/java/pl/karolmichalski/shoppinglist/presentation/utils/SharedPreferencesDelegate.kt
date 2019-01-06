@@ -1,4 +1,4 @@
-package pl.karolmichalski.shoppinglist.data.sharedPrefs
+package pl.karolmichalski.shoppinglist.presentation.utils
 
 import android.content.SharedPreferences
 import kotlin.properties.ReadWriteProperty
@@ -20,14 +20,14 @@ private inline fun <T> SharedPreferences.delegate(
 	}
 }
 
-fun SharedPreferences.Int(def: Int = 0, key: String? = null) =
+fun SharedPreferences.int(def: Int = 0, key: String? = null) =
 		delegate(def, key, SharedPreferences::getInt, SharedPreferences.Editor::putInt)
 
-fun SharedPreferences.Long(def: Long = 0, key: String? = null) =
+fun SharedPreferences.long(def: Long = 0, key: String? = null) =
 		delegate(def, key, SharedPreferences::getLong, SharedPreferences.Editor::putLong)
 
-fun SharedPreferences.Boolean(def: Boolean = false, key: String? = null) =
+fun SharedPreferences.boolean(def: Boolean = false, key: String? = null) =
 		delegate(def, key, SharedPreferences::getBoolean, SharedPreferences.Editor::putBoolean)
 
-fun SharedPreferences.String(def: String = "", key: String? = null) =
+fun SharedPreferences.string(def: String = "", key: String? = null) =
 		delegate(def, key, SharedPreferences::getString, SharedPreferences.Editor::putString)

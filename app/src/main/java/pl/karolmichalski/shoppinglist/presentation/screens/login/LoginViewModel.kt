@@ -4,18 +4,18 @@ import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.rxkotlin.subscribeBy
-import pl.karolmichalski.shoppinglist.data.sharedPrefs.Boolean
-import pl.karolmichalski.shoppinglist.data.sharedPrefs.String
 import pl.karolmichalski.shoppinglist.domain.user.UserRepository
+import pl.karolmichalski.shoppinglist.presentation.utils.boolean
+import pl.karolmichalski.shoppinglist.presentation.utils.string
 import javax.inject.Inject
 
 class LoginViewModel @Inject constructor(
 		private val sharedPrefs: SharedPreferences)
 	: ViewModel() {
 
-	private var SharedPreferences.isLoginRememberable by sharedPrefs.Boolean()
-	private var SharedPreferences.email by sharedPrefs.String()
-	private var SharedPreferences.password by sharedPrefs.String()
+	private var SharedPreferences.isLoginRememberable by sharedPrefs.boolean()
+	private var SharedPreferences.email by sharedPrefs.string()
+	private var SharedPreferences.password by sharedPrefs.string()
 
 	val email = MutableLiveData<String>().apply { value = sharedPrefs.email }
 	val password = MutableLiveData<String>().apply { value = sharedPrefs.password }
