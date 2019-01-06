@@ -1,8 +1,9 @@
-package pl.karolmichalski.shoppinglist.data.user
+package pl.karolmichalski.shoppinglist.di.modules
 
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
+import pl.karolmichalski.shoppinglist.data.user.UserRepositoryImpl
 import pl.karolmichalski.shoppinglist.domain.user.UserRepository
 import javax.inject.Named
 import javax.inject.Singleton

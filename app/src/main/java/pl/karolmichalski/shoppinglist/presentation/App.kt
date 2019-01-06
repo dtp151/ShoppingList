@@ -1,11 +1,11 @@
 package pl.karolmichalski.shoppinglist.presentation
 
 import androidx.multidex.MultiDexApplication
-import pl.karolmichalski.shoppinglist.data.product.ProductModule
-import pl.karolmichalski.shoppinglist.data.sharedPrefs.SharedPreferencesModule
-import pl.karolmichalski.shoppinglist.data.user.UserModule
 import pl.karolmichalski.shoppinglist.di.AppComponent
 import pl.karolmichalski.shoppinglist.di.DaggerAppComponent
+import pl.karolmichalski.shoppinglist.di.modules.ProductModule
+import pl.karolmichalski.shoppinglist.di.modules.SharedPreferencesModule
+import pl.karolmichalski.shoppinglist.di.modules.UserModule
 
 class App : MultiDexApplication() {
 

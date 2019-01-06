@@ -1,4 +1,4 @@
-package pl.karolmichalski.shoppinglist.data.sharedPrefs
+package pl.karolmichalski.shoppinglist.di.modules
 
 import android.content.Context
 import android.content.SharedPreferences

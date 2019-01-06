@@ -1,4 +1,4 @@
-package pl.karolmichalski.shoppinglist.data.product
+package pl.karolmichalski.shoppinglist.di.modules
 
 import android.content.Context
 import androidx.room.Room
@@ -9,6 +9,7 @@ import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import pl.karolmichalski.shoppinglist.BuildConfig
+import pl.karolmichalski.shoppinglist.data.product.ProductRepositoryImpl
 import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterface
 import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterfaceWrapper
 import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterfaceWrapperImpl
