@@ -6,11 +6,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import pl.karolmichalski.shoppinglist.R
 import pl.karolmichalski.shoppinglist.databinding.ActivityLoginBinding
+import pl.karolmichalski.shoppinglist.presentation.App
 import pl.karolmichalski.shoppinglist.presentation.screens.main.MainActivity
 import pl.karolmichalski.shoppinglist.presentation.utils.BundleDelegate
+import javax.inject.Inject
 
 
 class LoginActivity : AppCompatActivity(), LoginListener {
@@ -18,8 +21,11 @@ class LoginActivity : AppCompatActivity(), LoginListener {
 	private var Bundle.email by BundleDelegate.String("email")
 	private var Bundle.password by BundleDelegate.String("password")
 
+	@Inject
+	lateinit var viewModelFactory: ViewModelProvider.Factory
+
 	private val viewModel by lazy {
-		ViewModelProviders.of(this, LoginViewModel.Factory(application)).get(LoginViewModel::class.java)
+		ViewModelProviders.of(this, viewModelFactory)[LoginViewModel::class.java]
 	}
 
 	private val showError = Observer<String> {
@@ -28,6 +34,7 @@ class LoginActivity : AppCompatActivity(), LoginListener {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		(application as App).appComponent.inject(this)
 		if (viewModel.isUserLogged())
 			logIn()
 		else

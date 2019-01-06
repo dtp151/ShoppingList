@@ -7,23 +7,29 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import pl.karolmichalski.shoppinglist.R
 import pl.karolmichalski.shoppinglist.data.models.Product
 import pl.karolmichalski.shoppinglist.databinding.ActivityMainBinding
+import pl.karolmichalski.shoppinglist.presentation.App
 import pl.karolmichalski.shoppinglist.presentation.dialogs.DecisionDialog
 import pl.karolmichalski.shoppinglist.presentation.screens.login.LoginActivity
 import pl.karolmichalski.shoppinglist.presentation.utils.ActionModeManager
 import pl.karolmichalski.shoppinglist.presentation.utils.BundleDelegate
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callback, SwipeRefreshLayout.OnRefreshListener {
 
 	private var Bundle.selectedProducts by BundleDelegate.HashSet<Long>("selected_products")
 	private var Bundle.newProductName by BundleDelegate.String("new_product_name")
 
+	@Inject
+	lateinit var viewModelFactory: ViewModelProvider.Factory
+
 	private val viewModel by lazy {
-		ViewModelProviders.of(this, MainViewModel.Factory(application)).get(MainViewModel::class.java)
+		ViewModelProviders.of(this, viewModelFactory)[MainViewModel::class.java]
 	}
 
 	private val actionModeManager by lazy {
@@ -32,11 +38,12 @@ class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callba
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main).apply {
-			setLifecycleOwner(this@MainActivity)
-			viewModel = this@MainActivity.viewModel
-			listener = this@MainActivity
-			onRefreshListener = this@MainActivity
+		(application as App).appComponent.inject(this)
+		DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main).also {
+			it.setLifecycleOwner(this)
+			it.viewModel = viewModel
+			it.listener = this
+			it.onRefreshListener = this
 		}
 		viewModel.getProducts(this)
 	}

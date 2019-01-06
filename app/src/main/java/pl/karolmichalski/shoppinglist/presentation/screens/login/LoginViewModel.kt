@@ -1,36 +1,24 @@
 package pl.karolmichalski.shoppinglist.presentation.screens.login
 
-import android.app.Application
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import io.reactivex.rxkotlin.subscribeBy
-import pl.karolmichalski.shoppinglist.R
 import pl.karolmichalski.shoppinglist.data.sharedPrefs.Boolean
 import pl.karolmichalski.shoppinglist.data.sharedPrefs.String
 import pl.karolmichalski.shoppinglist.domain.user.UserRepository
-import pl.karolmichalski.shoppinglist.presentation.App
 import javax.inject.Inject
 
-class LoginViewModel(app: App) : ViewModel() {
-
-	class Factory(private val application: Application) : ViewModelProvider.NewInstanceFactory() {
-		override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-			@Suppress("UNCHECKED_CAST")
-			return LoginViewModel(application as App) as T
-		}
-	}
-
-	private val sharedPrefs: SharedPreferences = app.applicationContext.getSharedPreferences(app.applicationContext.getString(R.string.sharedpreferences_file_key), Context.MODE_PRIVATE)
+class LoginViewModel @Inject constructor(
+		private val sharedPrefs: SharedPreferences)
+	: ViewModel() {
 
 	private var SharedPreferences.isLoginRememberable by sharedPrefs.Boolean()
 	private var SharedPreferences.email by sharedPrefs.String()
 	private var SharedPreferences.password by sharedPrefs.String()
 
-	val email = MutableLiveData<String>()
-	val password = MutableLiveData<String>()
+	val email = MutableLiveData<String>().apply { value = sharedPrefs.email }
+	val password = MutableLiveData<String>().apply { value = sharedPrefs.password }
 	val isLoading = MutableLiveData<Boolean>().apply { value = false }
 	val isLoginRememberable = MutableLiveData<Boolean>().apply { value = sharedPrefs.isLoginRememberable }
 
@@ -40,26 +28,13 @@ class LoginViewModel(app: App) : ViewModel() {
 	@Inject
 	lateinit var userRepository: UserRepository
 
-	init {
-		app.appComponent.inject(this)
-	}
-
 	fun logInWithEmailAndPassword() {
 		userRepository.logIn(email.value, password.value)
 				.doOnSubscribe { isLoading.value = true }
 				.doFinally { isLoading.value = false }
 				.subscribeBy(
 						onSuccess = {
-							isLoginRememberable.value?.let { value ->
-								sharedPrefs.isLoginRememberable = value
-								if (value) {
-									sharedPrefs.email = email.value
-									sharedPrefs.password = password.value
-								} else {
-									sharedPrefs.email = ""
-									sharedPrefs.password = ""
-								}
-							}
+							resolveRememberableLogin()
 							loginSuccess.value = true
 						},
 						onError = { errorMessage.value = it.localizedMessage }
@@ -78,6 +53,19 @@ class LoginViewModel(app: App) : ViewModel() {
 
 	fun isUserLogged(): Boolean {
 		return userRepository.getCurrentUser() != null
+	}
+
+	private fun resolveRememberableLogin(){
+		isLoginRememberable.value?.let { value ->
+			sharedPrefs.isLoginRememberable = value
+			if (value) {
+				sharedPrefs.email = email.value
+				sharedPrefs.password = password.value
+			} else {
+				sharedPrefs.email = ""
+				sharedPrefs.password = ""
+			}
+		}
 	}
 
 }

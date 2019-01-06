@@ -1,22 +1,19 @@
 package pl.karolmichalski.shoppinglist.presentation.screens.main
 
-import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import pl.karolmichalski.shoppinglist.data.models.Product
 import pl.karolmichalski.shoppinglist.domain.product.ProductRepository
 import pl.karolmichalski.shoppinglist.domain.user.UserRepository
-import pl.karolmichalski.shoppinglist.presentation.App
 import pl.karolmichalski.shoppinglist.presentation.utils.observeOnce
 import javax.inject.Inject
 
-class MainViewModel(app: App) : ViewModel() {
-
-	class Factory(private val application: Application) : ViewModelProvider.NewInstanceFactory() {
-		override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-			@Suppress("UNCHECKED_CAST")
-			return MainViewModel(application as App) as T
-		}
-	}
+class MainViewModel @Inject constructor(
+		private val productRepository: ProductRepository,
+		private val userRepository: UserRepository
+) : ViewModel() {
 
 	val newProductName = MutableLiveData<String>()
 
@@ -25,16 +22,6 @@ class MainViewModel(app: App) : ViewModel() {
 	val selectedProducts = HashSet<Long>()
 
 	val isRefreshing = MutableLiveData<Boolean>().apply { value = false }
-
-	@Inject
-	lateinit var productRepository: ProductRepository
-
-	@Inject
-	lateinit var userRepository: UserRepository
-
-	init {
-		app.appComponent.inject(this)
-	}
 
 	fun getProducts(owner: LifecycleOwner) {
 		synchronizeProducts(owner)
