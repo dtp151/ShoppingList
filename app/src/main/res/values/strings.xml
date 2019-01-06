@@ -1,4 +1,6 @@
 <resources>
+    <string name="sharedpreferences_file_key">shared preferences</string>
+
     <string name="app_name">ShoppingList</string>
     <string name="log_in">Log in</string>
     <string name="log_out">Log out</string>
@@ -18,4 +20,5 @@
     <!--Questions-->
     <string name="are_you_sure_question">Are you sure?</string>
     <string name="are_you_sure_you_want_to_log_out_question">Are you sure you want to log out?</string>
+    <string name="remember_me">Remember me</string>
 </resources>

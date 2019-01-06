@@ -22,10 +22,6 @@ class LoginActivity : AppCompatActivity(), LoginListener {
 		ViewModelProviders.of(this, LoginViewModel.Factory(application)).get(LoginViewModel::class.java)
 	}
 
-	private val onLoginSuccess = Observer<Boolean> {
-		logIn()
-	}
-
 	private val showError = Observer<String> {
 		Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
 	}
@@ -53,13 +49,13 @@ class LoginActivity : AppCompatActivity(), LoginListener {
 	}
 
 	private fun initScreen() {
-		DataBindingUtil.setContentView<ActivityLoginBinding>(this, R.layout.activity_login).apply {
-			setLifecycleOwner(this@LoginActivity)
-			listener = this@LoginActivity
-			viewModel = this@LoginActivity.viewModel
+		DataBindingUtil.setContentView<ActivityLoginBinding>(this, R.layout.activity_login).also {
+			it.setLifecycleOwner(this)
+			it.listener = this
+			it.viewModel = viewModel
 		}
-		viewModel.loginSuccess.observe(this@LoginActivity, onLoginSuccess)
-		viewModel.errorMessage.observe(this@LoginActivity, showError)
+		viewModel.loginSuccess.observe(this, Observer { logIn() })
+		viewModel.errorMessage.observe(this, showError)
 	}
 
 	private fun logIn() {
