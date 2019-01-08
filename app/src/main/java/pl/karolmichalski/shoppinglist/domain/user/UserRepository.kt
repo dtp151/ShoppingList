@@ -9,7 +9,13 @@ interface UserRepository {
 
 	fun register(email: String?, password: String?): Single<FirebaseUser>
 
-	fun getCurrentUser(): FirebaseUser?
+	fun isLoggedIn(): Boolean
+
+	fun isLoginRememberable(): Boolean
+
+	fun getRememberedEmail(): String
+
+	fun getRememberedPassword(): String
 
 	fun logOut()
 

@@ -49,12 +49,24 @@ class UserRepositoryImpl(
 		}
 	}
 
-	override fun getCurrentUser(): FirebaseUser? {
-		return null
+	override fun isLoggedIn(): Boolean {
+		return sharedPrefs.uid.isNotEmpty()
+	}
+
+	override fun isLoginRememberable(): Boolean {
+		return sharedPrefs.isLogInRememberable
+	}
+
+	override fun getRememberedEmail(): String {
+		return sharedPrefs.email
+	}
+
+	override fun getRememberedPassword(): String {
+		return sharedPrefs.password
 	}
 
 	override fun logOut() {
-
+		sharedPrefs.uid = ""
 	}
 
 	private fun updateRememberableLogIn(email: String, password: String) {
