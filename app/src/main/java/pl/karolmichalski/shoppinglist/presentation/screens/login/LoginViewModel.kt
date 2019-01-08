@@ -16,6 +16,7 @@ class LoginViewModel @Inject constructor(
 	private var SharedPreferences.isLoginRememberable by sharedPrefs.boolean()
 	private var SharedPreferences.email by sharedPrefs.string()
 	private var SharedPreferences.password by sharedPrefs.string()
+	private var SharedPreferences.uid by sharedPrefs.string()
 
 	val email = MutableLiveData<String>().apply { value = sharedPrefs.email }
 	val password = MutableLiveData<String>().apply { value = sharedPrefs.password }
@@ -34,6 +35,7 @@ class LoginViewModel @Inject constructor(
 				.doFinally { isLoading.value = false }
 				.subscribeBy(
 						onSuccess = {
+							sharedPrefs.uid = it?.uid
 							resolveRememberableLogin()
 							loginSuccess.value = true
 						},
@@ -55,7 +57,7 @@ class LoginViewModel @Inject constructor(
 		return userRepository.getCurrentUser() != null
 	}
 
-	private fun resolveRememberableLogin(){
+	private fun resolveRememberableLogin() {
 		isLoginRememberable.value?.let { value ->
 			sharedPrefs.isLoginRememberable = value
 			if (value) {

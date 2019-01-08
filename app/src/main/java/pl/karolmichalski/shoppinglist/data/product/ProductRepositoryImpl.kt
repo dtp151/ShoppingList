@@ -1,8 +1,8 @@
 package pl.karolmichalski.shoppinglist.data.product
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
-import com.google.firebase.auth.FirebaseAuth
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -13,11 +13,15 @@ import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterfaceWrapper
 import pl.karolmichalski.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.karolmichalski.shoppinglist.domain.product.ProductRepository
 import pl.karolmichalski.shoppinglist.presentation.utils.getTimeStamp
+import pl.karolmichalski.shoppinglist.presentation.utils.string
 
 class ProductRepositoryImpl(
+		private val sharedPrefs: SharedPreferences,
 		private val localDatabase: LocalDatabaseDAO,
 		private val cloudInterfaceWrapper: CloudInterfaceWrapper)
 	: ProductRepository {
+
+	private var SharedPreferences.uid by sharedPrefs.string()
 
 	override fun getAll(): LiveData<List<Product>> {
 		return localDatabase.getAll()
@@ -30,7 +34,7 @@ class ProductRepositoryImpl(
 				.observeOn(Schedulers.io())
 				.subscribeBy(
 						onSuccess = { productId ->
-							cloudInterfaceWrapper.addProduct(FirebaseAuth.getInstance().currentUser!!.uid, productId, product.name)
+							cloudInterfaceWrapper.addProduct(sharedPrefs.uid, productId, product.name)
 									.subscribeBy(
 											onSuccess = {
 												product.status = Product.Status.SYNCED
@@ -63,7 +67,7 @@ class ProductRepositoryImpl(
 				.observeOn(Schedulers.io())
 				.subscribeBy(
 						onComplete = {
-							cloudInterfaceWrapper.deleteProduct(FirebaseAuth.getInstance().currentUser!!.uid, product.id)
+							cloudInterfaceWrapper.deleteProduct(sharedPrefs.uid, product.id)
 									.subscribeBy(
 											onSuccess = {
 												removeProductLocally(product)
@@ -88,7 +92,7 @@ class ProductRepositoryImpl(
 	}
 
 	override fun synchronize(productList: List<Product>?, doFinally: () -> Unit) {
-		cloudInterfaceWrapper.synchronizeProducts(FirebaseAuth.getInstance().currentUser!!.uid, productList)
+		cloudInterfaceWrapper.synchronizeProducts(sharedPrefs.uid, productList)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
 				.doFinally { doFinally() }

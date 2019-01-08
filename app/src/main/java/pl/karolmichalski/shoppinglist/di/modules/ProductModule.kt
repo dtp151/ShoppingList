@@ -1,6 +1,7 @@
 package pl.karolmichalski.shoppinglist.di.modules
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -30,9 +31,10 @@ class ProductModule(private val context: Context) {
 	@Provides
 	@Singleton
 	fun provideProductsRepository(
+			sharedPrefs: SharedPreferences,
 			localDatabase: LocalDatabaseDAO,
 			cloudInterfaceWrapper: CloudInterfaceWrapper): ProductRepository {
-		return ProductRepositoryImpl(localDatabase, cloudInterfaceWrapper)
+		return ProductRepositoryImpl(sharedPrefs, localDatabase, cloudInterfaceWrapper)
 	}
 
 	@Provides

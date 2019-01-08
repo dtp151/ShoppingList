@@ -1,5 +1,6 @@
 package pl.karolmichalski.shoppinglist.presentation.screens.main
 
+import android.content.SharedPreferences
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -8,9 +9,11 @@ import pl.karolmichalski.shoppinglist.data.models.Product
 import pl.karolmichalski.shoppinglist.domain.product.ProductRepository
 import pl.karolmichalski.shoppinglist.domain.user.UserRepository
 import pl.karolmichalski.shoppinglist.presentation.utils.observeOnce
+import pl.karolmichalski.shoppinglist.presentation.utils.string
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
+		private val sharedPrefs: SharedPreferences,
 		private val productRepository: ProductRepository,
 		private val userRepository: UserRepository
 ) : ViewModel() {
@@ -22,6 +25,8 @@ class MainViewModel @Inject constructor(
 	val selectedProducts = HashSet<Long>()
 
 	val isRefreshing = MutableLiveData<Boolean>().apply { value = false }
+
+	private var SharedPreferences.uid by sharedPrefs.string()
 
 	fun getProducts(owner: LifecycleOwner) {
 		synchronizeProducts(owner)
@@ -73,6 +78,7 @@ class MainViewModel @Inject constructor(
 	}
 
 	fun logOut() {
+		sharedPrefs.uid = ""
 		productRepository.clearDatabase()
 		userRepository.logOut()
 	}
