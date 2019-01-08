@@ -1,27 +1,54 @@
 package pl.karolmichalski.shoppinglist.di.modules
 
-import com.google.firebase.auth.FirebaseAuth
+import android.content.Context
+import android.content.SharedPreferences
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import dagger.Module
 import dagger.Provides
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import pl.karolmichalski.shoppinglist.BuildConfig
+import pl.karolmichalski.shoppinglist.data.user.UserInterface
 import pl.karolmichalski.shoppinglist.data.user.UserRepositoryImpl
 import pl.karolmichalski.shoppinglist.domain.user.UserRepository
-import javax.inject.Named
+import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.jackson.JacksonConverterFactory
 import javax.inject.Singleton
 
+private const val API_URL = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/"
+
 @Module
-class UserModule {
+class UserModule(private val context: Context) {
 
 	@Provides
 	@Singleton
-	fun provideUserRepository(
-			@Named("firebaseAuth") firebaseAuth: FirebaseAuth): UserRepository {
-		return UserRepositoryImpl(firebaseAuth)
+	fun provideUserRepository(sharedPrefs: SharedPreferences, userInterface: UserInterface): UserRepository {
+		return UserRepositoryImpl(context, sharedPrefs, userInterface)
 	}
 
 	@Provides
 	@Singleton
-	@Named("firebaseAuth")
-	fun provideFirebaseAuth(): FirebaseAuth {
-		return FirebaseAuth.getInstance()
+	fun provideUserInterface(): UserInterface {
+		val loggingInterceptor = HttpLoggingInterceptor().apply {
+			level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+		}
+
+		val okHttpClient = OkHttpClient.Builder()
+				.addInterceptor(loggingInterceptor)
+				.build()
+
+		val objectMapper = ObjectMapper()
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+		val retrofit = Retrofit.Builder()
+				.baseUrl(API_URL)
+				.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+				.client(okHttpClient)
+				.addConverterFactory(JacksonConverterFactory.create(objectMapper))
+				.build()
+
+		return retrofit.create(UserInterface::class.java)
 	}
 }

@@ -11,7 +11,7 @@ class App : MultiDexApplication() {
 
 	val appComponent: AppComponent by lazy {
 		DaggerAppComponent.builder()
-				.userModule(UserModule())
+				.userModule(UserModule(applicationContext))
 				.productModule(ProductModule(applicationContext))
 				.sharedPreferencesModule(SharedPreferencesModule(applicationContext))
 				.build()
