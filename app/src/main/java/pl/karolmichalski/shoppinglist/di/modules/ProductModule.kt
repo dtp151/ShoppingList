@@ -1,7 +1,6 @@
 package pl.karolmichalski.shoppinglist.di.modules
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.room.Room
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -17,6 +16,7 @@ import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterfaceWrapperIm
 import pl.karolmichalski.shoppinglist.data.product.local.LocalDatabase
 import pl.karolmichalski.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.karolmichalski.shoppinglist.domain.product.ProductRepository
+import pl.karolmichalski.shoppinglist.domain.user.UserRepository
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -31,10 +31,10 @@ class ProductModule(private val context: Context) {
 	@Provides
 	@Singleton
 	fun provideProductsRepository(
-			sharedPrefs: SharedPreferences,
+			userRepository: UserRepository,
 			localDatabase: LocalDatabaseDAO,
 			cloudInterfaceWrapper: CloudInterfaceWrapper): ProductRepository {
-		return ProductRepositoryImpl(sharedPrefs, localDatabase, cloudInterfaceWrapper)
+		return ProductRepositoryImpl(userRepository, localDatabase, cloudInterfaceWrapper)
 	}
 
 	@Provides
