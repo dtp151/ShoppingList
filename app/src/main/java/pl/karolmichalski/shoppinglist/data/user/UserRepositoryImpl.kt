@@ -24,9 +24,9 @@ class UserRepositoryImpl(
 
 	override fun logIn(isLoginRememberable: Boolean?, email: String?, password: String?): Single<User> {
 		return when {
-			email.isNullOrBlank() -> Single.fromCallable { throw Exception("Enter email!") }
-			password.isNullOrEmpty() -> Single.fromCallable { throw Exception("Enter Password!") }
-			isLoginRememberable == null -> Single.fromCallable { throw Exception("isLoginRememberable is null") }
+			email.isNullOrBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_email)) }
+			password.isNullOrEmpty() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
+			isLoginRememberable == null -> Single.fromCallable { throw Exception(context.getString(R.string.isloginrememberable_is_null)) }
 			else -> {
 				val apiKey = context.resources.getString(R.string.google_api_key)
 				val loginRequest = LoginRequest(email!!, password!!)
@@ -43,8 +43,8 @@ class UserRepositoryImpl(
 
 	override fun register(email: String?, password: String?): Single<FirebaseUser> {
 		return when {
-			email.isNullOrBlank() -> Single.fromCallable { throw Exception("Enter email!") }
-			password.isNullOrEmpty() -> Single.fromCallable { throw Exception("Enter Password!") }
+			email.isNullOrBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_email)) }
+			password.isNullOrEmpty() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
 			else -> Single.fromCallable { throw Exception("Enter Password!") }
 		}
 	}
