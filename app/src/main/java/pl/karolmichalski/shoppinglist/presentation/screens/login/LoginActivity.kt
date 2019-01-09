@@ -71,12 +71,12 @@ class LoginActivity : AppCompatActivity(), LoginListener {
 	}
 
 	override fun onLoginBtnClick() {
-		viewModel.logInWithEmailAndPassword()
+		viewModel.logIn()
 	}
 
 
 	override fun onRegisterBtnClick() {
-		viewModel.registerWithEmailAndPassword()
+		viewModel.register()
 	}
 
 }

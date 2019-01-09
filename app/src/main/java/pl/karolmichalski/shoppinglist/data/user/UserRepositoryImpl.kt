@@ -49,6 +49,10 @@ class UserRepositoryImpl(
 		}
 	}
 
+	override fun getUid(): String {
+		return sharedPrefs.uid
+	}
+
 	override fun isLoggedIn(): Boolean {
 		return sharedPrefs.uid.isNotEmpty()
 	}

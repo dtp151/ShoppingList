@@ -20,7 +20,7 @@ class LoginViewModel @Inject constructor(
 	val loginSuccess = MutableLiveData<Boolean>()
 	val errorMessage = MutableLiveData<String>()
 
-	fun logInWithEmailAndPassword() {
+	fun logIn() {
 		userRepository.logIn(isLoginRememberable.value, email.value, password.value)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
@@ -32,7 +32,7 @@ class LoginViewModel @Inject constructor(
 				)
 	}
 
-	fun registerWithEmailAndPassword() {
+	fun register() {
 		userRepository.register(email.value, password.value)
 				.doOnSubscribe { isLoading.value = true }
 				.doFinally { isLoading.value = false }

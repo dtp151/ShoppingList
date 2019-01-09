@@ -9,6 +9,8 @@ interface UserRepository {
 
 	fun register(email: String?, password: String?): Single<FirebaseUser>
 
+	fun getUid(): String
+
 	fun isLoggedIn(): Boolean
 
 	fun isLoginRememberable(): Boolean

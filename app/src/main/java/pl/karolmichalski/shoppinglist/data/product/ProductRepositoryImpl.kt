@@ -1,6 +1,5 @@
 package pl.karolmichalski.shoppinglist.data.product
 
-import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import io.reactivex.Completable
@@ -12,16 +11,14 @@ import pl.karolmichalski.shoppinglist.data.models.Product
 import pl.karolmichalski.shoppinglist.data.product.cloud.CloudInterfaceWrapper
 import pl.karolmichalski.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.karolmichalski.shoppinglist.domain.product.ProductRepository
+import pl.karolmichalski.shoppinglist.domain.user.UserRepository
 import pl.karolmichalski.shoppinglist.presentation.utils.getTimeStamp
-import pl.karolmichalski.shoppinglist.presentation.utils.string
 
 class ProductRepositoryImpl(
-		private val sharedPrefs: SharedPreferences,
+		private val userRepository: UserRepository,
 		private val localDatabase: LocalDatabaseDAO,
 		private val cloudInterfaceWrapper: CloudInterfaceWrapper)
 	: ProductRepository {
-
-	private var SharedPreferences.uid by sharedPrefs.string()
 
 	override fun getAll(): LiveData<List<Product>> {
 		return localDatabase.getAll()
@@ -34,7 +31,7 @@ class ProductRepositoryImpl(
 				.observeOn(Schedulers.io())
 				.subscribeBy(
 						onSuccess = { productId ->
-							cloudInterfaceWrapper.addProduct(sharedPrefs.uid, productId, product.name)
+							cloudInterfaceWrapper.addProduct(userRepository.getUid(), productId, product.name)
 									.subscribeBy(
 											onSuccess = {
 												product.status = Product.Status.SYNCED
@@ -67,7 +64,7 @@ class ProductRepositoryImpl(
 				.observeOn(Schedulers.io())
 				.subscribeBy(
 						onComplete = {
-							cloudInterfaceWrapper.deleteProduct(sharedPrefs.uid, product.id)
+							cloudInterfaceWrapper.deleteProduct(userRepository.getUid(), product.id)
 									.subscribeBy(
 											onSuccess = {
 												removeProductLocally(product)
@@ -92,7 +89,7 @@ class ProductRepositoryImpl(
 	}
 
 	override fun synchronize(productList: List<Product>?, doFinally: () -> Unit) {
-		cloudInterfaceWrapper.synchronizeProducts(sharedPrefs.uid, productList)
+		cloudInterfaceWrapper.synchronizeProducts(userRepository.getUid(), productList)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
 				.doFinally { doFinally() }
