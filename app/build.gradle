@@ -65,20 +65,6 @@ dependencies {
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
 
-    //required dependency: firebase-core
-    implementation "com.androidhuman.rxfirebase2:firebase-core:$firebase_core_version.0"
-    implementation "com.google.firebase:firebase-core:$firebase_core_version"
-
-    //firebase-auth
-    implementation "com.androidhuman.rxfirebase2:firebase-auth-kotlin:$firebase_auth_version.0"
-    implementation "com.androidhuman.rxfirebase2:firebase-auth:$firebase_auth_version.0"
-    implementation "com.google.firebase:firebase-auth:$firebase_auth_version"
-
-    //firebase-database
-    implementation "com.androidhuman.rxfirebase2:firebase-database-kotlin:$firebase_database_version.2"
-    implementation "com.androidhuman.rxfirebase2:firebase-database:$firebase_database_version.0"
-    implementation "com.google.firebase:firebase-database:$firebase_database_version"
-
     //dagger 2
     implementation "com.google.dagger:dagger:$dagger_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
