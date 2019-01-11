@@ -7,6 +7,7 @@ Ingredients:<br />
 -MVVM<br />
 -LiveData<br />
 -DataBinding<br />
+-ReactiveX<br />
 -Dagger 2<br />
 -Room Database<br />
 -Clean Architecture<br />
