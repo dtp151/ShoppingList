@@ -12,6 +12,7 @@ import pl.karolmichalski.shoppinglist.BuildConfig
 import pl.karolmichalski.shoppinglist.data.user.UserInterface
 import pl.karolmichalski.shoppinglist.data.user.UserRepositoryImpl
 import pl.karolmichalski.shoppinglist.domain.user.UserRepository
+import pl.karolmichalski.shoppinglist.presentation.utils.ApiErrorParser
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -25,7 +26,7 @@ class UserModule(private val context: Context) {
 	@Provides
 	@Singleton
 	fun provideUserRepository(sharedPrefs: SharedPreferences, userInterface: UserInterface): UserRepository {
-		return UserRepositoryImpl(context, sharedPrefs, userInterface)
+		return UserRepositoryImpl(context, sharedPrefs, userInterface, ApiErrorParser(context))
 	}
 
 	@Provides

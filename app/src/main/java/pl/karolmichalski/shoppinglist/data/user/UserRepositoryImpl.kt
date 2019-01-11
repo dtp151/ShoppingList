@@ -7,13 +7,15 @@ import pl.karolmichalski.shoppinglist.R
 import pl.karolmichalski.shoppinglist.data.models.User
 import pl.karolmichalski.shoppinglist.data.models.UserRequest
 import pl.karolmichalski.shoppinglist.domain.user.UserRepository
+import pl.karolmichalski.shoppinglist.presentation.utils.ApiErrorParser
 import pl.karolmichalski.shoppinglist.presentation.utils.boolean
 import pl.karolmichalski.shoppinglist.presentation.utils.string
 
 class UserRepositoryImpl(
 		private val context: Context,
 		private val sharedPrefs: SharedPreferences,
-		private val userInterface: UserInterface)
+		private val userInterface: UserInterface,
+		private val apiErrorParser: ApiErrorParser)
 	: UserRepository {
 
 	private var SharedPreferences.uid by sharedPrefs.string()
@@ -35,6 +37,7 @@ class UserRepositoryImpl(
 							sharedPrefs.isLogInRememberable = isLoginRememberable
 							updateRememberableLogIn(email, password)
 						}
+						.onErrorResumeNext { Single.error(apiErrorParser.parse(it)) }
 			}
 		}
 	}
@@ -50,6 +53,7 @@ class UserRepositoryImpl(
 						.doOnSuccess {
 							sharedPrefs.uid = it?.uid
 						}
+						.onErrorResumeNext { Single.error(apiErrorParser.parse(it)) }
 			}
 		}
 	}
