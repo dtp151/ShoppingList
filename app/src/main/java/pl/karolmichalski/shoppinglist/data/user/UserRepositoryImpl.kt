@@ -29,7 +29,7 @@ class UserRepositoryImpl(
 			password.isNullOrEmpty() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
 			isLoginRememberable == null -> Single.fromCallable { throw Exception(context.getString(R.string.isloginrememberable_is_null)) }
 			else -> {
-				val apiKey = context.resources.getString(R.string.google_api_key)
+				val apiKey = context.getString(R.string.api_key)
 				val userRequest = UserRequest(email!!, password!!)
 				userInterface.logIn(apiKey, userRequest)
 						.doOnSuccess {
@@ -47,7 +47,7 @@ class UserRepositoryImpl(
 			email.isNullOrBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_email)) }
 			password.isNullOrEmpty() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
 			else -> {
-				val apiKey = context.resources.getString(R.string.google_api_key)
+				val apiKey = context.getString(R.string.api_key)
 				val userRequest = UserRequest(email!!, password!!)
 				userInterface.register(apiKey, userRequest)
 						.doOnSuccess {

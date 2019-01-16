@@ -1,7 +1,8 @@
 <resources>
+    <string name="api_key">AIzaSyAdO1JWj2VjgaznGIK6d2k2nESE8HfzWeY</string>
     <string name="sharedpreferences_file_key">shared preferences</string>
-
     <string name="app_name">ShoppingList</string>
+
     <string name="log_in">Log in</string>
     <string name="log_out">Log out</string>
     <string name="register">Register</string>
