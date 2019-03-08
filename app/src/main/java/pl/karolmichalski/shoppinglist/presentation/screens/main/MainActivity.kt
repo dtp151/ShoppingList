@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), MainListener, ActionModeManager.Callba
 		super.onCreate(savedInstanceState)
 		(application as App).appComponent.inject(this)
 		DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main).also {
-			it.setLifecycleOwner(this)
+			it.lifecycleOwner = this
 			it.viewModel = viewModel
 			it.listener = this
 			it.onRefreshListener = this

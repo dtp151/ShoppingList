@@ -60,7 +60,7 @@ class ProductAdapter(private val onProductClick: (Product) -> Unit)
 	}
 
 	override fun getItemId(position: Int): Long {
-		return getItem(position).id.toLong()
+		return getItem(position).id
 	}
 
 }

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="api_key">AIzaSyAdO1JWj2VjgaznGIK6d2k2nESE8HfzWeY</string>
     <string name="sharedpreferences_file_key">shared preferences</string>
     <string name="app_name">ShoppingList</string>
@@ -28,9 +28,9 @@
     <string name="are_you_sure_you_want_to_log_out_question">Are you sure you want to log out?</string>
 
     <!--Api errors-->
-    <string name="EMAIL_NOT_FOUND">Email not found</string>
-    <string name="INVALID_PASSWORD">Invalid Password</string>
-    <string name="EMAIL_EXISTS">Email already exists</string>
-    <string name="INVALID_EMAIL">Email is invali</string>
+    <string name="EMAIL_NOT_FOUND" tools:keep="@string/EMAIL_NOT_FOUND">Email not found</string>
+    <string name="INVALID_PASSWORD" tools:keep="@string/INVALID_PASSWORD">Invalid Password</string>
+    <string name="EMAIL_EXISTS" tools:keep="@string/EMAIL_EXISTS">Email already exists</string>
+    <string name="INVALID_EMAIL" tools:keep="@string/INVALID_EMAIL">Email is invali</string>
 
 </resources>

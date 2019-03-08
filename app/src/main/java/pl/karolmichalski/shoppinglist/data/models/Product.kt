@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 @Entity(tableName = "products")
 class Product(@ColumnInfo(name = "id")
 			  @JsonProperty("id")
-			  @PrimaryKey()
+			  @PrimaryKey
 			  var id: Long = 0,
 			  @ColumnInfo(name = "name")
 			  @JsonProperty("name")

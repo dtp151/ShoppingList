@@ -94,10 +94,10 @@ class ProductRepositoryImpl(
 				.observeOn(Schedulers.io())
 				.doFinally { doFinally() }
 				.subscribeBy(
-						onSuccess = {
-							it.map { it.status = Product.Status.SYNCED }
+						onSuccess = { products ->
+							products.map { it.status = Product.Status.SYNCED }
 							localDatabase.deleteAll()
-							localDatabase.insertProducts(it)
+							localDatabase.insertProducts(products)
 						},
 						onError = {
 

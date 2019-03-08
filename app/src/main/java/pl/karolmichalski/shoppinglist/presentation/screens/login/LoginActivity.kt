@@ -57,7 +57,7 @@ class LoginActivity : AppCompatActivity(), LoginListener {
 
 	private fun initScreen() {
 		DataBindingUtil.setContentView<ActivityLoginBinding>(this, R.layout.activity_login).also {
-			it.setLifecycleOwner(this)
+			it.lifecycleOwner = this
 			it.listener = this
 			it.viewModel = viewModel
 		}

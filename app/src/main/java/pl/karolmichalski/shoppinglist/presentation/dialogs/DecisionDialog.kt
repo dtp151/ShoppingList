@@ -21,7 +21,7 @@ class DecisionDialog : DialogFragment() {
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 		attemptSettingDefaultTexts()
 		return DataBindingUtil.inflate<DialogDecisionBinding>(inflater, R.layout.dialog_decision, container, false).also {
-			it.setLifecycleOwner(this)
+			it.lifecycleOwner = this
 			it.title = title
 			it.button1text = button1text
 			it.button2text = button2text

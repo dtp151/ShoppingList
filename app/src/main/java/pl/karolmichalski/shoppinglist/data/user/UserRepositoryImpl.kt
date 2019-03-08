@@ -30,7 +30,7 @@ class UserRepositoryImpl(
 			isLoginRememberable == null -> Single.fromCallable { throw Exception(context.getString(R.string.isloginrememberable_is_null)) }
 			else -> {
 				val apiKey = context.getString(R.string.api_key)
-				val userRequest = UserRequest(email!!, password!!)
+				val userRequest = UserRequest(email, password)
 				userInterface.logIn(apiKey, userRequest)
 						.doOnSuccess {
 							sharedPrefs.uid = it?.uid
@@ -48,7 +48,7 @@ class UserRepositoryImpl(
 			password.isNullOrEmpty() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
 			else -> {
 				val apiKey = context.getString(R.string.api_key)
-				val userRequest = UserRequest(email!!, password!!)
+				val userRequest = UserRequest(email, password)
 				userInterface.register(apiKey, userRequest)
 						.doOnSuccess {
 							sharedPrefs.uid = it?.uid

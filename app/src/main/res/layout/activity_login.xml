@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="Autofill">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -39,10 +38,12 @@
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="@string/e_mail"
                     android:hint="@string/e_mail"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
-                    android:text="@={viewModel.email}" />
+                    android:text="@={viewModel.email}"
+                    tools:targetApi="o" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -56,10 +57,12 @@
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autofillHints="@string/password"
                     android:hint="@string/password"
                     android:inputType="textPassword"
                     android:maxLines="1"
-                    android:text="@={viewModel.password}" />
+                    android:text="@={viewModel.password}"
+                    tools:targetApi="o" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -93,6 +96,7 @@
                 android:padding="10dp"
                 android:text="@string/remember_me"
                 app:checked="@={viewModel.isLoginRememberable}"
+                app:layout_constraintStart_toStartOf="@id/loginBtn"
                 app:layout_constraintTop_toBottomOf="@id/registerBtn" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
