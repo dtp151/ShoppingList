@@ -15,5 +15,5 @@ interface ProductRepository {
 
 	fun clearDatabase()
 
-	fun synchronize(productList: List<Product>?, doFinally: () -> Unit)
+	fun synchronize(productList: List<Product>?, onSynchronized: () -> Unit)
 }

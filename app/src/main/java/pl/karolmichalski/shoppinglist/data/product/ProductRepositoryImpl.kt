@@ -3,7 +3,6 @@ package pl.karolmichalski.shoppinglist.data.product
 import android.util.Log
 import androidx.lifecycle.LiveData
 import io.reactivex.Completable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -26,7 +25,7 @@ class ProductRepositoryImpl(
 
 	override fun insert(name: String) {
 		val product = Product(getTimeStamp(), name, Product.Status.ADDED)
-		Single.fromCallable { localDatabase.insert(product) }
+		localDatabase.insert(product)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
 				.subscribeBy(
@@ -35,7 +34,7 @@ class ProductRepositoryImpl(
 									.subscribeBy(
 											onSuccess = {
 												product.status = Product.Status.SYNCED
-												localDatabase.update(product)
+												localDatabase.update(product).subscribe()
 											},
 											onError = {
 
@@ -51,7 +50,7 @@ class ProductRepositoryImpl(
 	}
 
 	override fun update(product: Product) {
-		Completable.fromAction { localDatabase.update(product) }
+		localDatabase.update(product)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe()
@@ -59,7 +58,7 @@ class ProductRepositoryImpl(
 
 	override fun delete(product: Product) {
 		product.status = Product.Status.DELETED
-		Completable.fromAction { localDatabase.update(product) }
+		localDatabase.update(product)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
 				.subscribeBy(
@@ -67,7 +66,8 @@ class ProductRepositoryImpl(
 							cloudInterfaceWrapper.deleteProduct(userRepository.getUid(), product.id)
 									.subscribeBy(
 											onSuccess = {
-												removeProductLocally(product)
+												localDatabase.delete(product)
+														.subscribe()
 
 											},
 											onError = {
@@ -88,28 +88,21 @@ class ProductRepositoryImpl(
 				.subscribe()
 	}
 
-	override fun synchronize(productList: List<Product>?, doFinally: () -> Unit) {
+	override fun synchronize(productList: List<Product>?, onSynchronized: () -> Unit) {
 		cloudInterfaceWrapper.synchronizeProducts(userRepository.getUid(), productList)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
-				.doFinally { doFinally() }
+				.doFinally { onSynchronized() }
 				.subscribeBy(
 						onSuccess = { products ->
 							products.map { it.status = Product.Status.SYNCED }
-							localDatabase.deleteAll()
-							localDatabase.insert(products)
+							clearDatabase()
+							localDatabase.insert(products).subscribe()
 						},
 						onError = {
 
 						}
 				)
-	}
-
-	private fun removeProductLocally(product: Product) {
-		Completable
-				.fromAction { localDatabase.delete(product) }
-				.subscribeOn(Schedulers.io())
-				.subscribe()
 	}
 
 }

@@ -38,7 +38,7 @@ class MainViewModel @Inject constructor(
 	fun synchronizeProducts(owner: LifecycleOwner) {
 		productRepository.getAll().observeOnce(owner, Observer { productList ->
 			productRepository.synchronize(productList,
-					doFinally = { isRefreshing.postValue(false) })
+					onSynchronized = { isRefreshing.postValue(false) })
 		})
 	}
 
