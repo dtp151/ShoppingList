@@ -20,7 +20,7 @@ class ProductRepositoryImpl(
     : ProductRepository {
 
     override fun getAll(): LiveData<List<Product>> {
-        return localDatabase.getAll()
+        return localDatabase.selectAll()
     }
 
     override fun insert(name: String) {
@@ -74,8 +74,8 @@ class ProductRepositoryImpl(
 
     }
 
-    override fun clearDatabase() {
-        Completable.fromAction { localDatabase.deleteAll() }
+    override fun clearLocalDatabase() {
+        Completable.fromAction { localDatabase.clearTable() }
                 .subscribeOn(Schedulers.io())
                 .subscribe()
     }
@@ -87,9 +87,11 @@ class ProductRepositoryImpl(
                 .doFinally { onSynchronized() }
                 .subscribeBy(
                         onSuccess = { products ->
-                            clearDatabase()
-                            products.map { it.status = Product.Status.SYNCED }
-                            localDatabase.insert(products).subscribe()
+                            Completable.fromAction { localDatabase.clearTable() }
+                                    .subscribe {
+                                        products.map { it.status = Product.Status.SYNCED }
+                                        localDatabase.insert(products).subscribe()
+                                    }
                         },
                         onError = { Crashlytics.logException(it) }
                 )

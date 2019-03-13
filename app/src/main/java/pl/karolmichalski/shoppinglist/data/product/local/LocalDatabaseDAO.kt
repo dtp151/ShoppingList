@@ -12,7 +12,7 @@ import pl.karolmichalski.shoppinglist.data.models.Product
 interface LocalDatabaseDAO {
 
 	@Query("Select * from products")
-	fun getAll(): LiveData<List<Product>>
+	fun selectAll(): LiveData<List<Product>>
 
 	@Insert(onConflict = REPLACE)
 	fun insert(product: Product): Single<Long>
@@ -27,6 +27,6 @@ interface LocalDatabaseDAO {
 	fun delete(product: Product): Completable
 
 	@Query("Delete from products")
-	fun deleteAll()
+	fun clearTable()
 
 }

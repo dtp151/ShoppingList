@@ -13,7 +13,7 @@ interface ProductRepository {
 
 	fun delete(product: Product)
 
-	fun clearDatabase()
+	fun clearLocalDatabase()
 
 	fun synchronize(productList: List<Product>?, onSynchronized: () -> Unit)
 }

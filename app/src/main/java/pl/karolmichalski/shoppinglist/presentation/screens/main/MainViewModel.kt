@@ -74,6 +74,6 @@ class MainViewModel @Inject constructor(
 
 	fun logOut() {
 		userRepository.logOut()
-		productRepository.clearDatabase()
+		productRepository.clearLocalDatabase()
 	}
 }
