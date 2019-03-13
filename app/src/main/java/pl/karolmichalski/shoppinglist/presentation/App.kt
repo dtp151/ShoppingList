@@ -1,6 +1,8 @@
 package pl.karolmichalski.shoppinglist.presentation
 
 import androidx.multidex.MultiDexApplication
+import com.crashlytics.android.Crashlytics
+import io.fabric.sdk.android.Fabric
 import pl.karolmichalski.shoppinglist.di.AppComponent
 import pl.karolmichalski.shoppinglist.di.DaggerAppComponent
 import pl.karolmichalski.shoppinglist.di.modules.ProductModule
@@ -17,4 +19,8 @@ class App : MultiDexApplication() {
 				.build()
 	}
 
+	override fun onCreate() {
+		super.onCreate()
+		Fabric.with(this, Crashlytics())
+	}
 }
