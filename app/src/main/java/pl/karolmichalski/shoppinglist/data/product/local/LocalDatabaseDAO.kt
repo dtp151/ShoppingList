@@ -16,7 +16,7 @@ interface LocalDatabaseDAO {
 	fun insert(product: Product): Long
 
 	@Insert(onConflict = REPLACE)
-	fun insertProducts(productList: List<Product>)
+	fun insert(productList: List<Product>)
 
 	@Update
 	fun update(product: Product)

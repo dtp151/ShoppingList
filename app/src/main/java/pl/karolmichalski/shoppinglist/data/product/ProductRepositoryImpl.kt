@@ -97,7 +97,7 @@ class ProductRepositoryImpl(
 						onSuccess = { products ->
 							products.map { it.status = Product.Status.SYNCED }
 							localDatabase.deleteAll()
-							localDatabase.insertProducts(products)
+							localDatabase.insert(products)
 						},
 						onError = {
 
