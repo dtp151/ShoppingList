@@ -19,6 +19,8 @@ class ProductRepositoryImpl(
         private val cloudInterfaceWrapper: CloudInterfaceWrapper)
     : ProductRepository {
 
+    //TODO dispose disposables
+
     override fun getAll(): LiveData<List<Product>> {
         return localDatabase.selectAll()
     }
