@@ -95,8 +95,8 @@ class ProductRepositoryImpl(
 				.doFinally { onSynchronized() }
 				.subscribeBy(
 						onSuccess = { products ->
-							products.map { it.status = Product.Status.SYNCED }
 							clearDatabase()
+							products.map { it.status = Product.Status.SYNCED }
 							localDatabase.insert(products).subscribe()
 						},
 						onError = {
