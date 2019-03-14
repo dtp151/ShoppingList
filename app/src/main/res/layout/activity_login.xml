@@ -9,11 +9,11 @@
 
         <variable
             name="listener"
-            type="pl.karolmichalski.shoppinglist.presentation.screens.login.LoginListener" />
+            type="pl.developit.shoppinglist.presentation.screens.login.LoginListener" />
 
         <variable
             name="viewModel"
-            type="pl.karolmichalski.shoppinglist.presentation.screens.login.LoginViewModel" />
+            type="pl.developit.shoppinglist.presentation.screens.login.LoginViewModel" />
 
     </data>
 
@@ -101,7 +101,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <pl.karolmichalski.shoppinglist.presentation.customviews.LoadingLayout
+        <pl.developit.shoppinglist.presentation.customviews.LoadingLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}" />

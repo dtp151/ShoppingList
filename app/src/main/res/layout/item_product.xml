@@ -6,7 +6,7 @@
 
         <variable
             name="product"
-            type="pl.karolmichalski.shoppinglist.data.models.Product" />
+            type="pl.developit.shoppinglist.data.models.Product" />
 
         <variable
             name="listener"

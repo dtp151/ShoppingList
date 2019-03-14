@@ -7,7 +7,7 @@ apply plugin: 'io.fabric'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "pl.karolmichalski.shoppinglist"
+        applicationId "pl.developit.shoppinglist"
         minSdkVersion 17
         targetSdkVersion 28
         versionCode 1

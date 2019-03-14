@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="pl.karolmichalski.shoppinglist">
+    package="pl.developit.shoppinglist">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".presentation.App"
+        android:name="pl.developit.shoppinglist.presentation.App"
         android:allowBackup="true"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
@@ -13,11 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="pl.karolmichalski.shoppinglist.presentation.screens.main.MainActivity">
+        <activity android:name="pl.developit.shoppinglist.presentation.screens.main.MainActivity">
 
         </activity>
 
-        <activity android:name="pl.karolmichalski.shoppinglist.presentation.screens.login.LoginActivity">
+        <activity android:name="pl.developit.shoppinglist.presentation.screens.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />

@@ -7,11 +7,11 @@
 
         <variable
             name="viewModel"
-            type="pl.karolmichalski.shoppinglist.presentation.screens.main.MainViewModel" />
+            type="pl.developit.shoppinglist.presentation.screens.main.MainViewModel" />
 
         <variable
             name="listener"
-            type="pl.karolmichalski.shoppinglist.presentation.screens.main.MainListener" />
+            type="pl.developit.shoppinglist.presentation.screens.main.MainListener" />
 
         <variable
             name="onRefreshListener"
