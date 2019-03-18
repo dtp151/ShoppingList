@@ -98,9 +98,7 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 
 	override fun onActionModeDestroyed() {
 		viewModel.deselectAllProducts()
-		viewModel.productList.value = viewModel.productList.value
 	}
-
 
 	override fun onAddBtnClick() {
 		viewModel.newProductName.value?.let { name ->
@@ -122,7 +120,6 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 			it.onButton1Click = { logout() }
 		}.show(childFragmentManager, DecisionDialog::class.java.simpleName)
 	}
-
 
 	private fun logout() {
 		viewModel.logOut()

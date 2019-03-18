@@ -66,6 +66,7 @@ class ShoppingViewModel @Inject constructor(
 				selectedProducts.remove(product.id)
 			}
 		}
+		notifyProductListChanged()
 	}
 
 	fun clearNewProductName() {
@@ -76,4 +77,9 @@ class ShoppingViewModel @Inject constructor(
 		userRepository.logOut()
 		productRepository.clearLocalDatabase()
 	}
+
+	private fun notifyProductListChanged() {
+		productList.value = productList.value
+	}
+
 }
