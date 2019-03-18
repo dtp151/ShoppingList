@@ -7,7 +7,7 @@ import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.IntoMap
 import pl.developit.shoppinglist.presentation.screens.login.LoginViewModel
-import pl.developit.shoppinglist.presentation.screens.main.MainViewModel
+import pl.developit.shoppinglist.presentation.screens.shopping.ShoppingViewModel
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
@@ -26,8 +26,8 @@ abstract class ViewModelModule {
 
 	@Binds
 	@IntoMap
-	@ViewModelKey(MainViewModel::class)
-	internal abstract fun postMainViewModel(viewModel: MainViewModel): ViewModel
+	@ViewModelKey(ShoppingViewModel::class)
+	internal abstract fun postMainViewModel(viewModel: ShoppingViewModel): ViewModel
 
 }
 

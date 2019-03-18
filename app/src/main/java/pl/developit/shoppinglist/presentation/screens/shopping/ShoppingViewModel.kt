@@ -1,4 +1,4 @@
-package pl.developit.shoppinglist.presentation.screens.main
+package pl.developit.shoppinglist.presentation.screens.shopping
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -10,7 +10,7 @@ import pl.developit.shoppinglist.domain.user.UserRepository
 import pl.developit.shoppinglist.presentation.utils.observeOnce
 import javax.inject.Inject
 
-class MainViewModel @Inject constructor(
+class ShoppingViewModel @Inject constructor(
 		private val productRepository: ProductRepository,
 		private val userRepository: UserRepository
 ) : ViewModel() {
@@ -42,7 +42,7 @@ class MainViewModel @Inject constructor(
 		})
 	}
 
-	fun invalidateProductSelection(product: Product) {
+	fun invalidateSelectionFor(product: Product) {
 		product.isChecked = product.isChecked.not()
 		if (product.isChecked)
 			selectedProducts.add(product.id)

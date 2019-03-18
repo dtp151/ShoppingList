@@ -1,4 +1,4 @@
-package pl.developit.shoppinglist.presentation.screens.main.viewholders
+package pl.developit.shoppinglist.presentation.screens.shopping.viewholders
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

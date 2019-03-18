@@ -1,9 +1,9 @@
-package pl.developit.shoppinglist.presentation.screens.main
+package pl.developit.shoppinglist.presentation.screens.shopping
 
 import pl.developit.shoppinglist.data.models.Product
 
 
-interface MainListener {
+interface ShoppingListener {
 	fun onAddBtnClick()
 
 	fun onProductClick(): (Product) -> Unit

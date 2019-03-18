@@ -10,7 +10,8 @@ class ActionModeManager(private val callback: Callback) {
 	private var mode: ActionMode? = null
 	private var isActive = false
 
-	fun invalidateCount(checkedProductCount: Int) {
+	fun invalidateCount() {
+		val checkedProductCount = callback.getCheckedProductsCount()
 		if (checkedProductCount > 0 && !isActive)
 			mode = callback.onStartSupportActionMode(actionModeCallback)
 		else if (checkedProductCount == 0)
@@ -49,6 +50,8 @@ class ActionModeManager(private val callback: Callback) {
 	}
 
 	interface Callback {
+		fun getCheckedProductsCount(): Int
+
 		fun onStartSupportActionMode(callback: ActionMode.Callback): ActionMode?
 
 		fun onDeleteButtonClicked()

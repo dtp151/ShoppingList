@@ -17,17 +17,17 @@ class LoginViewModel @Inject constructor(
 	val isLoading = MutableLiveData<Boolean>().apply { value = false }
 	val isLoginRememberable = MutableLiveData<Boolean>().apply { value = userRepository.isLoginRememberable() }
 
-	val loginSuccess = MutableLiveData<Boolean>()
+	val loginResult = MutableLiveData<Boolean>()
 	val errorMessage = MutableLiveData<String>()
 
-	fun logIn() {
+	fun logIn(){
 		userRepository.logIn(isLoginRememberable.value, email.value, password.value)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.doOnSubscribe { isLoading.value = true }
 				.doFinally { isLoading.value = false }
 				.subscribeBy(
-						onSuccess = { loginSuccess.value = true },
+						onSuccess = { loginResult.value = true },
 						onError = { errorMessage.value = it.localizedMessage }
 				)
 	}
@@ -39,7 +39,7 @@ class LoginViewModel @Inject constructor(
 				.doOnSubscribe { isLoading.value = true }
 				.doFinally { isLoading.value = false }
 				.subscribeBy(
-						onSuccess = { loginSuccess.value = true },
+						onSuccess = { loginResult.value = true },
 						onError = { errorMessage.value = it.localizedMessage }
 				)
 	}
