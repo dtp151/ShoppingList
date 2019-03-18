@@ -102,7 +102,7 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 
 	override fun onAddBtnClick() {
 		viewModel.newProductName.value?.let { name ->
-			viewModel.addProduct(name)
+			viewModel.addNewProduct(name)
 		}
 		viewModel.clearNewProductName()
 	}

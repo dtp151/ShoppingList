@@ -31,7 +31,7 @@ class ShoppingViewModel @Inject constructor(
 		})
 	}
 
-	fun addProduct(name: String) {
+	fun addNewProduct(name: String) {
 		productRepository.insert(name)
 	}
 
