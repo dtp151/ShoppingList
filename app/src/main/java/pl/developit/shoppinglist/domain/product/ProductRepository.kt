@@ -7,11 +7,11 @@ interface ProductRepository {
 
 	fun getAll(): LiveData<List<Product>>
 
+	fun syncAll(): LiveData<Boolean>
+
 	fun insert(name: String)
 
 	fun markAsDeleted(product: Product)
-
-	fun syncAll()
 
 	fun clearLocalDatabase()
 

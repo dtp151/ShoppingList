@@ -27,7 +27,9 @@ class ShoppingViewModel @Inject constructor(
 			productList.value = list.filter { it.status != Product.Status.DELETED }
 			productList.value?.map { it.isChecked = selectedProducts.contains(it.id) }
 		})
-		productRepository.syncAll()
+		productRepository.syncAll().observe(owner, Observer {
+			isRefreshing.value = it
+		})
 	}
 
 	fun addNewProduct(name: String) {

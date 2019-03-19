@@ -1,6 +1,5 @@
 package pl.developit.shoppinglist.data.product
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.crashlytics.android.Crashlytics
@@ -25,10 +24,16 @@ class ProductRepositoryImpl(
 	//TODO add disposing
 
 	private val productList = MutableLiveData<List<Product>>()
+	private val isSyncing = MutableLiveData<Boolean>()
 
 	override fun getAll(): LiveData<List<Product>> {
-		observeLocalProducts()
+		observeLocalTable()
 		return productList
+	}
+
+	override fun syncAll(): LiveData<Boolean> {
+		syncDatabases()
+		return isSyncing
 	}
 
 	override fun insert(name: String) {
@@ -45,10 +50,6 @@ class ProductRepositoryImpl(
 						.subscribeBy(onComplete = { deleteRemotelyAndLocally(product) }))
 	}
 
-	override fun syncAll() {
-		syncDatabases()
-	}
-
 	override fun clearLocalDatabase() {
 		disposables.add(
 				Completable.fromAction { localDatabase.clearTable() }
@@ -56,17 +57,12 @@ class ProductRepositoryImpl(
 						.subscribe())
 	}
 
-	private fun observeLocalProducts() {
+	private fun observeLocalTable() {
 		disposables.add(
 				localDatabase.selectAll()
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
-						.subscribeBy(
-								onComplete = { Log.d("XDDD", "onComplete")},
-								onError = {Log.d("XDDD", "onError")},
-								onNext = { list ->
-									Log.d("XDDD", "onNext")
-									productList.postValue(list) }))
+						.subscribeBy(onNext = { list -> productList.postValue(list) }))
 	}
 
 	private fun syncDatabases() {
@@ -74,14 +70,10 @@ class ProductRepositoryImpl(
 				cloudInterfaceWrapper.synchronizeProducts(userRepository.getUid(), productList.value)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
+						.doOnSubscribe { isSyncing.postValue(true) }
+						.doFinally { isSyncing.postValue(false) }
 						.subscribeBy(
-								onSuccess = { products ->
-									Completable.fromAction { localDatabase.clearTable() }
-											.subscribe {
-												products.map { it.status = Product.Status.SYNCED }
-												insertLocally(products)
-											}
-								},
+								onSuccess = { products -> clearLocalTableAndInsertLocally(products) },
 								onError = { Crashlytics.logException(it) }))
 	}
 
@@ -114,6 +106,17 @@ class ProductRepositoryImpl(
 									updateLocally(product)
 								},
 								onError = { Crashlytics.logException(it) }))
+	}
+
+	private fun clearLocalTableAndInsertLocally(products: List<Product>) {
+		disposables.add(
+				Completable.fromAction { localDatabase.clearTable() }
+						.subscribeOn(Schedulers.io())
+						.observeOn(Schedulers.io())
+						.subscribe {
+							products.map { it.status = Product.Status.SYNCED }
+							insertLocally(products)
+						})
 	}
 
 	private fun insertLocally(products: List<Product>) {
