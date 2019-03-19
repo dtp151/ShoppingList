@@ -81,7 +81,7 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 	}
 
 	override fun onRefresh() {
-		viewModel.synchronizeProducts(this)
+		viewModel.syncProducts()
 	}
 
 	override fun getCheckedProductsCount(): Int {

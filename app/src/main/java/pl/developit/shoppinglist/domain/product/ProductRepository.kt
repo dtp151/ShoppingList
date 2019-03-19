@@ -9,11 +9,10 @@ interface ProductRepository {
 
 	fun insert(name: String)
 
-	fun update(product: Product)
+	fun markAsDeleted(product: Product)
 
-	fun delete(product: Product)
+	fun syncAll()
 
 	fun clearLocalDatabase()
 
-	fun synchronize(productList: List<Product>?, onSynchronized: () -> Unit)
 }

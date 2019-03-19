@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.domain.product.ProductRepository
 import pl.developit.shoppinglist.domain.user.UserRepository
-import pl.developit.shoppinglist.presentation.utils.observeOnce
 import javax.inject.Inject
 
 class ShoppingViewModel @Inject constructor(
@@ -24,22 +23,19 @@ class ShoppingViewModel @Inject constructor(
 	val isRefreshing = MutableLiveData<Boolean>().apply { value = false }
 
 	fun getProducts(owner: LifecycleOwner) {
-		synchronizeProducts(owner)
 		productRepository.getAll().observe(owner, Observer { list ->
-			productList.value = list?.filter { it.status != Product.Status.DELETED }
-					.apply { this?.map { it.isChecked = selectedProducts.contains(it.id) } }
+			productList.value = list.filter { it.status != Product.Status.DELETED }
+			productList.value?.map { it.isChecked = selectedProducts.contains(it.id) }
 		})
+		productRepository.syncAll()
 	}
 
 	fun addNewProduct(name: String) {
 		productRepository.insert(name)
 	}
 
-	fun synchronizeProducts(owner: LifecycleOwner) {
-		productRepository.getAll().observeOnce(owner, Observer { productList ->
-			productRepository.synchronize(productList,
-					onSynchronized = { isRefreshing.postValue(false) })
-		})
+	fun syncProducts() {
+		productRepository.syncAll()
 	}
 
 	fun invalidateSelectionFor(product: Product) {
@@ -53,7 +49,7 @@ class ShoppingViewModel @Inject constructor(
 	fun removeCheckedProducts() {
 		productList.value?.forEach { product ->
 			if (selectedProducts.contains(product.id)) {
-				productRepository.delete(product)
+				productRepository.markAsDeleted(product)
 				selectedProducts.remove(product.id)
 			}
 		}

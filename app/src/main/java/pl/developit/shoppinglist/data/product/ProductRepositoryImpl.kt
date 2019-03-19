@@ -1,9 +1,11 @@
 package pl.developit.shoppinglist.data.product
 
+import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.crashlytics.android.Crashlytics
 import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.data.models.Product
@@ -14,89 +16,125 @@ import pl.developit.shoppinglist.domain.user.UserRepository
 import pl.developit.shoppinglist.presentation.utils.getTimeStamp
 
 class ProductRepositoryImpl(
-        private val userRepository: UserRepository,
-        private val localDatabase: LocalDatabaseDAO,
-        private val cloudInterfaceWrapper: CloudInterfaceWrapper)
-    : ProductRepository {
+		private val userRepository: UserRepository,
+		private val localDatabase: LocalDatabaseDAO,
+		private val cloudInterfaceWrapper: CloudInterfaceWrapper)
+	: ProductRepository {
 
-    //TODO dispose disposables
+	private val disposables = CompositeDisposable()
+	//TODO add disposing
 
-    override fun getAll(): LiveData<List<Product>> {
-        return localDatabase.selectAll()
-    }
+	private val productList = MutableLiveData<List<Product>>()
 
-    override fun insert(name: String) {
-        val product = Product(getTimeStamp(), name, Product.Status.ADDED)
-        localDatabase.insert(product)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribeBy(
-                        onSuccess = { productId ->
-                            cloudInterfaceWrapper.addProduct(userRepository.getUid(), productId, product.name)
-                                    .subscribeBy(
-                                            onSuccess = {
-                                                product.status = Product.Status.SYNCED
-                                                localDatabase.update(product).subscribe()
-                                            },
-                                            onError = { Crashlytics.logException(it) })
+	override fun getAll(): LiveData<List<Product>> {
+		observeLocalProducts()
+		return productList
+	}
 
+	override fun insert(name: String) {
+		val product = Product(getTimeStamp(), name, Product.Status.ADDED)
+		insertLocallyAndRemotely(product)
+	}
 
-                        },
-                        onError = { Crashlytics.logException(it) }
-                )
+	override fun markAsDeleted(product: Product) {
+		product.status = Product.Status.DELETED
+		disposables.add(
+				localDatabase.update(product)
+						.subscribeOn(Schedulers.io())
+						.observeOn(Schedulers.io())
+						.subscribeBy(onComplete = { deleteRemotelyAndLocally(product) }))
+	}
 
-    }
+	override fun syncAll() {
+		syncDatabases()
+	}
 
-    override fun update(product: Product) {
-        localDatabase.update(product)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
-    }
+	override fun clearLocalDatabase() {
+		disposables.add(
+				Completable.fromAction { localDatabase.clearTable() }
+						.subscribeOn(Schedulers.io())
+						.subscribe())
+	}
 
-    override fun delete(product: Product) {
-        product.status = Product.Status.DELETED
-        localDatabase.update(product)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribeBy(
-                        onComplete = {
-                            cloudInterfaceWrapper.deleteProduct(userRepository.getUid(), product.id)
-                                    .subscribeBy(
-                                            onSuccess = {
-                                                localDatabase.delete(product)
-                                                        .subscribe()
+	private fun observeLocalProducts() {
+		disposables.add(
+				localDatabase.selectAll()
+						.subscribeOn(Schedulers.io())
+						.observeOn(Schedulers.io())
+						.subscribeBy(
+								onComplete = { Log.d("XDDD", "onComplete")},
+								onError = {Log.d("XDDD", "onError")},
+								onNext = { list ->
+									Log.d("XDDD", "onNext")
+									productList.postValue(list) }))
+	}
 
-                                            },
-                                            onError = { Crashlytics.logException(it) }
-                                    )
-                        },
-                        onError = { Crashlytics.logException(it) }
-                )
+	private fun syncDatabases() {
+		disposables.add(
+				cloudInterfaceWrapper.synchronizeProducts(userRepository.getUid(), productList.value)
+						.subscribeOn(Schedulers.io())
+						.observeOn(Schedulers.io())
+						.subscribeBy(
+								onSuccess = { products ->
+									Completable.fromAction { localDatabase.clearTable() }
+											.subscribe {
+												products.map { it.status = Product.Status.SYNCED }
+												insertLocally(products)
+											}
+								},
+								onError = { Crashlytics.logException(it) }))
+	}
 
-    }
+	private fun insertLocallyAndRemotely(product: Product) {
+		disposables.add(
+				localDatabase.insert(product)
+						.subscribeOn(Schedulers.io())
+						.observeOn(Schedulers.io())
+						.subscribeBy(onComplete = { insertRemotelyAndMarkSyncedLocally(product) }))
+	}
 
-    override fun clearLocalDatabase() {
-        Completable.fromAction { localDatabase.clearTable() }
-                .subscribeOn(Schedulers.io())
-                .subscribe()
-    }
+	private fun deleteRemotelyAndLocally(product: Product) {
+		disposables.add(
+				cloudInterfaceWrapper.deleteProduct(userRepository.getUid(), product.id)
+						.subscribeOn(Schedulers.io())
+						.observeOn(Schedulers.io())
+						.subscribeBy(
+								onSuccess = { deleteLocally(product) },
+								onError = { Crashlytics.logException(it) }))
+	}
 
-    override fun synchronize(productList: List<Product>?, onSynchronized: () -> Unit) {
-        cloudInterfaceWrapper.synchronizeProducts(userRepository.getUid(), productList)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .doFinally { onSynchronized() }
-                .subscribeBy(
-                        onSuccess = { products ->
-                            Completable.fromAction { localDatabase.clearTable() }
-                                    .subscribe {
-                                        products.map { it.status = Product.Status.SYNCED }
-                                        localDatabase.insert(products).subscribe()
-                                    }
-                        },
-                        onError = { Crashlytics.logException(it) }
-                )
-    }
+	private fun insertRemotelyAndMarkSyncedLocally(product: Product) {
+		disposables.add(
+				cloudInterfaceWrapper.addProduct(userRepository.getUid(), product.id, product.name)
+						.subscribeOn(Schedulers.io())
+						.observeOn(Schedulers.io())
+						.subscribeBy(
+								onSuccess = {
+									product.status = Product.Status.SYNCED
+									updateLocally(product)
+								},
+								onError = { Crashlytics.logException(it) }))
+	}
+
+	private fun insertLocally(products: List<Product>) {
+		disposables.add(
+				localDatabase.insert(products)
+						.subscribeOn(Schedulers.io())
+						.subscribe())
+	}
+
+	private fun updateLocally(product: Product) {
+		disposables.add(
+				localDatabase.update(product)
+						.subscribeOn(Schedulers.io())
+						.subscribe())
+	}
+
+	private fun deleteLocally(product: Product) {
+		disposables.add(
+				localDatabase.delete(product)
+						.subscribeOn(Schedulers.io())
+						.subscribe())
+	}
 
 }

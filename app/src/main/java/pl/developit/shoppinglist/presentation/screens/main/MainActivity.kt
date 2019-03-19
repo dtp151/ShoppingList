@@ -17,6 +17,9 @@ class MainActivity : AppCompatActivity(), MainCommunicator {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		(application as App).appComponent.inject(this)
+
+		//TODO add FEATURE_INDETERMINATE_PROGRESS
+
 		setContentView(R.layout.activity_main)
 
 		if (savedInstanceState != null) // if savedInstanceState is not null then it means that we are returning to the app and fragment has been saved = no need to show new fragment
