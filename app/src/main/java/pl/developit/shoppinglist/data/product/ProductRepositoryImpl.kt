@@ -21,7 +21,6 @@ class ProductRepositoryImpl(
 	: ProductRepository {
 
 	private val disposables = CompositeDisposable()
-	//TODO add disposing
 
 	private val productList = MutableLiveData<List<Product>>()
 	private val isSyncing = MutableLiveData<Boolean>()
@@ -56,6 +55,11 @@ class ProductRepositoryImpl(
 						.subscribeOn(Schedulers.io())
 						.subscribe())
 	}
+
+	override fun clearDisposables() {
+		disposables.clear()
+	}
+
 
 	private fun observeLocalTable() {
 		disposables.add(

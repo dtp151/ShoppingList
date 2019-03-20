@@ -22,6 +22,11 @@ class ShoppingViewModel @Inject constructor(
 
 	val isRefreshing = MutableLiveData<Boolean>().apply { value = false }
 
+	override fun onCleared() {
+		super.onCleared()
+		productRepository.clearDisposables()
+	}
+
 	fun getProducts(owner: LifecycleOwner) {
 		productRepository.getAll().observe(owner, Observer { list ->
 			productList.value = list.filter { it.status != Product.Status.DELETED }

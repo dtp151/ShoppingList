@@ -15,4 +15,6 @@ interface ProductRepository {
 
 	fun clearLocalDatabase()
 
+	fun clearDisposables()
+
 }
