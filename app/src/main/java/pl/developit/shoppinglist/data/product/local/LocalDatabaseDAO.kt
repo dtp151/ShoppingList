@@ -26,6 +26,9 @@ interface LocalDatabaseDAO {
 	@Delete
 	fun delete(product: Product): Completable
 
+	@Delete
+	fun delete(productList: List<Product>?): Completable
+
 	@Query("Delete from products")
 	fun clearTable()
 

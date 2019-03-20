@@ -70,14 +70,15 @@ class ProductRepositoryImpl(
 	}
 
 	private fun syncDatabases() {
+		val productList = productList.value
 		disposables.add(
-				cloudInterfaceWrapper.synchronizeProducts(userRepository.getUid(), productList.value)
+				cloudInterfaceWrapper.synchronizeProducts(userRepository.getUid(), productList)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.doOnSubscribe { isSyncing.postValue(true) }
 						.doFinally { isSyncing.postValue(false) }
 						.subscribeBy(
-								onSuccess = { products -> clearLocalTableAndInsertLocally(products) },
+								onSuccess = { newProductList -> replaceLocally(productList, newProductList) },
 								onError = { Crashlytics.logException(it) }))
 	}
 
@@ -112,14 +113,14 @@ class ProductRepositoryImpl(
 								onError = { Crashlytics.logException(it) }))
 	}
 
-	private fun clearLocalTableAndInsertLocally(products: List<Product>) {
+	private fun replaceLocally(oldProducts: List<Product>?, newProducts: List<Product>) {
 		disposables.add(
-				Completable.fromAction { localDatabase.clearTable() }
+				localDatabase.delete(oldProducts)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribe {
-							products.map { it.status = Product.Status.SYNCED }
-							insertLocally(products)
+							newProducts.map { it.status = Product.Status.SYNCED }
+							insertLocally(newProducts)
 						})
 	}
 
