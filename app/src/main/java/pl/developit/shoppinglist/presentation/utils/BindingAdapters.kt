@@ -4,6 +4,7 @@ import android.widget.CheckedTextView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 @BindingAdapter("checked")
 fun CheckedTextView.setChecked(isChecked: Boolean) {
@@ -21,4 +22,14 @@ fun CheckedTextView.setCheckedListener(attrChange: InverseBindingListener) {
 		isChecked = isChecked.not()
 		attrChange.onChange()
 	}
+}
+
+@BindingAdapter("onRefreshListener")
+fun SwipeRefreshLayout.setOnRefreshListener(onRefreshListener: SwipeRefreshLayout.OnRefreshListener) {
+	setOnRefreshListener(onRefreshListener)
+}
+
+@BindingAdapter("isRefreshing")
+fun SwipeRefreshLayout.setIsRefreshing(isRefreshing: Boolean) {
+	setRefreshing(isRefreshing)
 }
