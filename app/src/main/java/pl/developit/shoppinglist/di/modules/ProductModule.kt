@@ -29,7 +29,6 @@ private const val API_URL = "https://us-central1-shoppinglist-4fa3b.cloudfunctio
 class ProductModule(private val context: Context) {
 
 	@Provides
-	@Singleton
 	fun provideProductsRepository(
 			userRepository: UserRepository,
 			localDatabase: LocalDatabaseDAO,
