@@ -39,6 +39,7 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		appComponent.inject(this)
+
 		val binding = DataBindingUtil.inflate<FragmentShoppingBinding>(inflater, R.layout.fragment_shopping, container, false).also {
 			it.lifecycleOwner = this
 			it.viewModel = viewModel

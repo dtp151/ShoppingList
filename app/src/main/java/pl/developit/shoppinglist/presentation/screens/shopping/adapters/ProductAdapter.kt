@@ -12,7 +12,7 @@ import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.presentation.screens.shopping.viewholders.ProductViewHolder
 
 @BindingAdapter("productList", "onItemClick")
-fun RecyclerView.setProducts(productList: List<Product>, onProductClick: (Product) -> Unit) {
+fun RecyclerView.setProducts(productList: List<Product>?, onProductClick: (Product) -> Unit) {
 	if (adapter == null)
 		adapter = ProductAdapter(onProductClick)
 	(adapter as ProductAdapter).submitList(productList)

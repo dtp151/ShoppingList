@@ -1,6 +1,5 @@
 package pl.developit.shoppinglist.data.product
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.crashlytics.android.Crashlytics
 import io.reactivex.Completable
@@ -22,17 +21,15 @@ class ProductRepositoryImpl(
 
 	private val disposables = CompositeDisposable()
 
-	private val productList = MutableLiveData<List<Product>>()
-	private val isSyncing = MutableLiveData<Boolean>()
+	override val productList = MutableLiveData<List<Product>>()
+	override val isSyncing = MutableLiveData<Boolean>()
 
-	override fun getAll(): LiveData<List<Product>> {
+	init {
 		observeLocalTable()
-		return productList
 	}
 
-	override fun syncAll(): LiveData<Boolean> {
+	override fun sync() {
 		syncDatabases()
-		return isSyncing
 	}
 
 	override fun insert(name: String) {

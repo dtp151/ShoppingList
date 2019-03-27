@@ -5,9 +5,10 @@ import pl.developit.shoppinglist.data.models.Product
 
 interface ProductRepository {
 
-	fun getAll(): LiveData<List<Product>>
+	val productList: LiveData<List<Product>>
+	val isSyncing: LiveData<Boolean>
 
-	fun syncAll(): LiveData<Boolean>
+	fun sync()
 
 	fun insert(name: String)
 

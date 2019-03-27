@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity(), MainCommunicator {
 		(application as App).appComponent.inject(this)
 
 		setContentView(R.layout.activity_main)
+
 		if (savedInstanceState != null) // if savedInstanceState is not null then it means that we are returning to the app and fragment has been saved = no need to show new fragment
 			return
 

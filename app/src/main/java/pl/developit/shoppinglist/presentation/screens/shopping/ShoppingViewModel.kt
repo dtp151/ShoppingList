@@ -1,9 +1,6 @@
 package pl.developit.shoppinglist.presentation.screens.shopping
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.domain.product.ProductRepository
 import pl.developit.shoppinglist.domain.user.UserRepository
@@ -14,13 +11,12 @@ class ShoppingViewModel @Inject constructor(
 		private val userRepository: UserRepository
 ) : ViewModel() {
 
-	val newProductName = MutableLiveData<String>()
-
-	val productList = MutableLiveData<List<Product>>().apply { value = ArrayList() }
-
 	val selectedProducts = HashSet<Long>()
 
-	val isRefreshing = MutableLiveData<Boolean>().apply { value = false }
+	//bindings
+	val newProductName = MutableLiveData<String>()
+	val productList = MutableLiveData<List<Product>>()
+	val isRefreshing: LiveData<Boolean> = productRepository.isSyncing
 
 	override fun onCleared() {
 		super.onCleared()
@@ -28,13 +24,11 @@ class ShoppingViewModel @Inject constructor(
 	}
 
 	fun getProducts(owner: LifecycleOwner) {
-		productRepository.getAll().observe(owner, Observer { list ->
+		productRepository.productList.observe(owner, Observer { list ->
 			productList.value = list.filter { it.status != Product.Status.DELETED }
 			productList.value?.map { it.isChecked = selectedProducts.contains(it.id) }
 		})
-		productRepository.syncAll().observe(owner, Observer {
-			isRefreshing.value = it
-		})
+		productRepository.sync()
 	}
 
 	fun addNewProduct(name: String) {
@@ -42,7 +36,7 @@ class ShoppingViewModel @Inject constructor(
 	}
 
 	fun syncProducts() {
-		productRepository.syncAll()
+		productRepository.sync()
 	}
 
 	fun invalidateSelectionFor(product: Product) {
