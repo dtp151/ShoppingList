@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.domain.product.ProductRepository
 import pl.developit.shoppinglist.domain.user.UserRepository
+import pl.developit.shoppinglist.presentation.utils.observeOnce
 import javax.inject.Inject
 
 class ShoppingViewModel @Inject constructor(
@@ -28,7 +29,7 @@ class ShoppingViewModel @Inject constructor(
 			productList.value = list.filter { it.status != Product.Status.DELETED }
 			productList.value?.map { it.isChecked = selectedProducts.contains(it.id) }
 		})
-		productRepository.sync()
+		productRepository.productList.observeOnce(owner, Observer { productRepository.sync() })
 	}
 
 	fun addNewProduct(name: String) {
