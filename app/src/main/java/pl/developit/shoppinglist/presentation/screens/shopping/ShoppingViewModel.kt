@@ -60,7 +60,7 @@ class ShoppingViewModel @Inject constructor(
 	fun deselectAllProducts() {
 		productList.value?.map { it.isChecked = false }
 		selectedProducts.clear()
-		notifyProductListChanged()
+		productList.notifyChanged()
 	}
 
 	fun clearNewProductName() {
@@ -72,8 +72,8 @@ class ShoppingViewModel @Inject constructor(
 		productRepository.clearLocalDatabase()
 	}
 
-	private fun notifyProductListChanged() {
-		productList.value = productList.value
+	private fun MutableLiveData<List<Product>>.notifyChanged(){
+		value = value
 	}
 
 }
