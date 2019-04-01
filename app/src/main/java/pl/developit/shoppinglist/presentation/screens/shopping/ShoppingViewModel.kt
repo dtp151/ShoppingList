@@ -58,12 +58,8 @@ class ShoppingViewModel @Inject constructor(
 	}
 
 	fun deselectAllProducts() {
-		productList.value?.forEach { product ->
-			if (selectedProducts.contains(product.id)) {
-				product.isChecked = false
-				selectedProducts.remove(product.id)
-			}
-		}
+		productList.value?.map { it.isChecked = false }
+		selectedProducts.clear()
 		notifyProductListChanged()
 	}
 
