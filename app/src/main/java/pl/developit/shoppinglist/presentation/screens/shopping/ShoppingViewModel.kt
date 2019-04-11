@@ -5,9 +5,8 @@ import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.domain.product.ProductRepository
 import pl.developit.shoppinglist.domain.user.UserRepository
 import pl.developit.shoppinglist.presentation.utils.observeOnce
-import javax.inject.Inject
 
-class ShoppingViewModel @Inject constructor(
+class ShoppingViewModel(
 		private val productRepository: ProductRepository,
 		private val userRepository: UserRepository
 ) : ViewModel() {
@@ -72,7 +71,7 @@ class ShoppingViewModel @Inject constructor(
 		productRepository.clearLocalDatabase()
 	}
 
-	private fun MutableLiveData<List<Product>>.notifyChanged(){
+	private fun MutableLiveData<List<Product>>.notifyChanged() {
 		value = value
 	}
 

@@ -6,9 +6,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.domain.user.UserRepository
-import javax.inject.Inject
 
-class LoginViewModel @Inject constructor(
+class LoginViewModel(
 		private val userRepository: UserRepository)
 	: ViewModel() {
 
@@ -20,7 +19,7 @@ class LoginViewModel @Inject constructor(
 	val loginResult = MutableLiveData<Boolean>()
 	val errorMessage = MutableLiveData<String>()
 
-	fun logIn(){
+	fun logIn() {
 		userRepository.logIn(isLoginRememberable.value, email.value, password.value)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
@@ -47,6 +46,5 @@ class LoginViewModel @Inject constructor(
 	fun isUserLogged(): Boolean {
 		return userRepository.isLoggedIn()
 	}
-
 
 }

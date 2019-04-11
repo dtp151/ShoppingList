@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import org.koin.android.viewmodel.ext.android.viewModel
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.databinding.FragmentShoppingBinding
@@ -14,19 +13,13 @@ import pl.developit.shoppinglist.presentation.dialogs.DecisionDialog
 import pl.developit.shoppinglist.presentation.utils.ActionModeManager
 import pl.developit.shoppinglist.presentation.utils.BaseFragment
 import pl.developit.shoppinglist.presentation.utils.BundleDelegate
-import javax.inject.Inject
 
 class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.OnRefreshListener, ActionModeManager.Callback {
 
 	private var Bundle.selectedProducts by BundleDelegate.HashSet<Long>("selected_products")
 	private var Bundle.newProductName by BundleDelegate.String("new_product_name")
 
-	@Inject
-	lateinit var viewModelFactory: ViewModelProvider.Factory
-
-	private val viewModel by lazy {
-		ViewModelProviders.of(this, viewModelFactory)[ShoppingViewModel::class.java]
-	}
+	private val viewModel by viewModel<ShoppingViewModel>()
 
 	private val actionModeManager by lazy {
 		ActionModeManager(this)
@@ -38,8 +31,6 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 	}
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-		appComponent.inject(this)
-
 		val binding = DataBindingUtil.inflate<FragmentShoppingBinding>(inflater, R.layout.fragment_shopping, container, false).also {
 			it.lifecycleOwner = this
 			it.viewModel = viewModel

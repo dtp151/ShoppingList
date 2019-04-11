@@ -7,25 +7,19 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import org.koin.android.viewmodel.ext.android.viewModel
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.databinding.FragmentLoginBinding
 import pl.developit.shoppinglist.presentation.utils.BaseFragment
 import pl.developit.shoppinglist.presentation.utils.BundleDelegate
-import javax.inject.Inject
 
 class LoginFragment : BaseFragment(), LoginListener {
 
 	private var Bundle.email by BundleDelegate.String("email")
 	private var Bundle.password by BundleDelegate.String("password")
 
-	@Inject
-	lateinit var viewModelFactory: ViewModelProvider.Factory
 
-	private val viewModel by lazy {
-		ViewModelProviders.of(this, viewModelFactory)[LoginViewModel::class.java]
-	}
+	private val viewModel by viewModel<LoginViewModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -33,8 +27,6 @@ class LoginFragment : BaseFragment(), LoginListener {
 	}
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-		appComponent.inject(this)
-
 		val binding = DataBindingUtil.inflate<FragmentLoginBinding>(inflater, R.layout.fragment_login, container, false).also {
 			it.lifecycleOwner = this
 			it.listener = this

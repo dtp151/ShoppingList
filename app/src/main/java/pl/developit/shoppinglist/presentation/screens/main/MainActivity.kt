@@ -4,19 +4,16 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.FragmentManager
+import org.koin.android.ext.android.inject
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.domain.user.UserRepository
-import pl.developit.shoppinglist.presentation.App
-import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), MainCommunicator {
 
-	@Inject
-	lateinit var userRepository: UserRepository
+	private val userRepository by inject<UserRepository>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		(application as App).appComponent.inject(this)
 
 		setContentView(R.layout.activity_main)
 
