@@ -5,6 +5,7 @@ import android.view.*
 import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.ext.android.viewModel
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.data.models.Product
@@ -19,7 +20,7 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 	private var Bundle.selectedProducts by BundleDelegate.HashSet<Long>("selected_products")
 	private var Bundle.newProductName by BundleDelegate.String("new_product_name")
 
-	private val viewModel by viewModel<ShoppingViewModel>()
+	private val viewModel by viewModel<ShoppingViewModel>(scope = currentScope)
 
 	private val actionModeManager by lazy {
 		ActionModeManager(this)
