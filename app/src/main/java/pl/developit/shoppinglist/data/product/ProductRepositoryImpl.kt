@@ -7,15 +7,15 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.data.models.Product
-import pl.developit.shoppinglist.data.product.cloud.CloudInterface
+import pl.developit.shoppinglist.data.product.cloud.RemoteProductSource
 import pl.developit.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.developit.shoppinglist.domain.product.ProductRepository
 import pl.developit.shoppinglist.presentation.utils.getTimeStamp
 
 class ProductRepositoryImpl(
 		private val uid: String,
-		private val localDatabase: LocalDatabaseDAO,
-		private val cloudInterface: CloudInterface)
+		private val localProductSource: LocalDatabaseDAO,
+		private val remoteProductSource: RemoteProductSource)
 	: ProductRepository {
 
 	private val disposables = CompositeDisposable()
@@ -39,7 +39,7 @@ class ProductRepositoryImpl(
 	override fun markAsDeleted(product: Product) {
 		product.status = Product.Status.DELETED
 		disposables.add(
-				localDatabase.update(product)
+				localProductSource.update(product)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribeBy(onComplete = { deleteRemotelyAndLocally(product) }))
@@ -47,7 +47,7 @@ class ProductRepositoryImpl(
 
 	override fun clearLocalDatabase() {
 		disposables.add(
-				Completable.fromAction { localDatabase.clearTable() }
+				Completable.fromAction { localProductSource.clearTable() }
 						.subscribeOn(Schedulers.io())
 						.subscribe())
 	}
@@ -59,7 +59,7 @@ class ProductRepositoryImpl(
 
 	private fun observeLocalTable() {
 		disposables.add(
-				localDatabase.selectAll()
+				localProductSource.selectAll()
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribeBy(onNext = { list -> productList.postValue(list) }))
@@ -68,7 +68,7 @@ class ProductRepositoryImpl(
 	private fun syncDatabases() {
 		val productList = productList.value
 		disposables.add(
-				cloudInterface.synchronizeProducts(uid, productList)
+				remoteProductSource.synchronizeProducts(uid, productList)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.doOnSubscribe { isSyncing.postValue(true) }
@@ -80,7 +80,7 @@ class ProductRepositoryImpl(
 
 	private fun insertLocallyAndRemotely(product: Product) {
 		disposables.add(
-				localDatabase.insert(product)
+				localProductSource.insert(product)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribeBy(onComplete = { insertRemotelyAndMarkSyncedLocally(product) }))
@@ -88,7 +88,7 @@ class ProductRepositoryImpl(
 
 	private fun deleteRemotelyAndLocally(product: Product) {
 		disposables.add(
-				cloudInterface.deleteProduct(uid, product.id)
+				remoteProductSource.deleteProduct(uid, product.id)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribeBy(
@@ -98,7 +98,7 @@ class ProductRepositoryImpl(
 
 	private fun insertRemotelyAndMarkSyncedLocally(product: Product) {
 		disposables.add(
-				cloudInterface.addProduct(uid, product.id, product.name)
+				remoteProductSource.addProduct(uid, product.id, product.name)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribeBy(
@@ -111,7 +111,7 @@ class ProductRepositoryImpl(
 
 	private fun replaceLocally(oldProducts: List<Product>?, newProducts: List<Product>) {
 		disposables.add(
-				localDatabase.delete(oldProducts)
+				localProductSource.delete(oldProducts)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribe {
@@ -122,21 +122,21 @@ class ProductRepositoryImpl(
 
 	private fun insertLocally(products: List<Product>) {
 		disposables.add(
-				localDatabase.insert(products)
+				localProductSource.insert(products)
 						.subscribeOn(Schedulers.io())
 						.subscribe())
 	}
 
 	private fun updateLocally(product: Product) {
 		disposables.add(
-				localDatabase.update(product)
+				localProductSource.update(product)
 						.subscribeOn(Schedulers.io())
 						.subscribe())
 	}
 
 	private fun deleteLocally(product: Product) {
 		disposables.add(
-				localDatabase.delete(product)
+				localProductSource.delete(product)
 						.subscribeOn(Schedulers.io())
 						.subscribe())
 	}

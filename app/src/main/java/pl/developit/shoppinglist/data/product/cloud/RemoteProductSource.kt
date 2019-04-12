@@ -16,13 +16,13 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface CloudInterface {
+interface RemoteProductSource {
 
 	object Builder {
 
 		private const val API_URL = "https://us-central1-shoppinglist-4fa3b.cloudfunctions.net/"
 
-		fun build(): CloudInterface {
+		fun build(): RemoteProductSource {
 			val loggingInterceptor = HttpLoggingInterceptor().apply {
 				level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
 			}
@@ -42,7 +42,7 @@ interface CloudInterface {
 					.addConverterFactory(JacksonConverterFactory.create(objectMapper))
 					.build()
 
-			return retrofit.create(CloudInterface::class.java)
+			return retrofit.create(RemoteProductSource::class.java)
 		}
 	}
 

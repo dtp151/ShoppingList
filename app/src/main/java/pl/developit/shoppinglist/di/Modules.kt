@@ -8,7 +8,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.data.product.ProductRepositoryImpl
-import pl.developit.shoppinglist.data.product.cloud.CloudInterface
+import pl.developit.shoppinglist.data.product.cloud.RemoteProductSource
 import pl.developit.shoppinglist.data.product.local.LocalDatabase
 import pl.developit.shoppinglist.data.user.UserInterface
 import pl.developit.shoppinglist.data.user.UserRepositoryImpl
@@ -27,7 +27,7 @@ val viewModelFactoryModule = module {
 val productsModule = module {
 	scope(named<ShoppingFragment>()) {
 		scoped { LocalDatabase.Builder.build(androidContext()) }
-		scoped { CloudInterface.Builder.build() }
+		scoped { RemoteProductSource.Builder.build() }
 		scoped<ProductRepository> { ProductRepositoryImpl(get<UserRepository>().getUid(), get(), get()) }
 	}
 }
