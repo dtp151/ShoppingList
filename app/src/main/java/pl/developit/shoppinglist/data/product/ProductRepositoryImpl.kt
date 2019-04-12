@@ -10,11 +10,10 @@ import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.data.product.cloud.CloudInterface
 import pl.developit.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.developit.shoppinglist.domain.product.ProductRepository
-import pl.developit.shoppinglist.domain.user.UserRepository
 import pl.developit.shoppinglist.presentation.utils.getTimeStamp
 
 class ProductRepositoryImpl(
-		private val userRepository: UserRepository,
+		private val uid: String,
 		private val localDatabase: LocalDatabaseDAO,
 		private val cloudInterface: CloudInterface)
 	: ProductRepository {
@@ -69,7 +68,7 @@ class ProductRepositoryImpl(
 	private fun syncDatabases() {
 		val productList = productList.value
 		disposables.add(
-				cloudInterface.synchronizeProducts(userRepository.getUid(), productList)
+				cloudInterface.synchronizeProducts(uid, productList)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.doOnSubscribe { isSyncing.postValue(true) }
@@ -89,7 +88,7 @@ class ProductRepositoryImpl(
 
 	private fun deleteRemotelyAndLocally(product: Product) {
 		disposables.add(
-				cloudInterface.deleteProduct(userRepository.getUid(), product.id)
+				cloudInterface.deleteProduct(uid, product.id)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribeBy(
@@ -99,7 +98,7 @@ class ProductRepositoryImpl(
 
 	private fun insertRemotelyAndMarkSyncedLocally(product: Product) {
 		disposables.add(
-				cloudInterface.addProduct(userRepository.getUid(), product.id, product.name)
+				cloudInterface.addProduct(uid, product.id, product.name)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribeBy(

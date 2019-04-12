@@ -28,7 +28,7 @@ val productsModule = module {
 	scope(named<ShoppingFragment>()) {
 		scoped { LocalDatabase.Builder.build(androidContext()) }
 		scoped { CloudInterface.Builder.build() }
-		scoped<ProductRepository> { ProductRepositoryImpl(get(), get(), get()) }
+		scoped<ProductRepository> { ProductRepositoryImpl(get<UserRepository>().getUid(), get(), get()) }
 	}
 }
 
