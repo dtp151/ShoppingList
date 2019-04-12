@@ -2,8 +2,8 @@ package pl.developit.shoppinglist.presentation.screens.shopping
 
 import androidx.lifecycle.*
 import pl.developit.shoppinglist.data.models.Product
-import pl.developit.shoppinglist.domain.product.ProductRepository
-import pl.developit.shoppinglist.domain.user.UserRepository
+import pl.developit.shoppinglist.domain.ProductRepository
+import pl.developit.shoppinglist.domain.UserRepository
 import pl.developit.shoppinglist.presentation.utils.observeOnce
 
 class ShoppingViewModel(

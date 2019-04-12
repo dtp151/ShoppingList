@@ -6,7 +6,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.FragmentManager
 import org.koin.android.ext.android.inject
 import pl.developit.shoppinglist.R
-import pl.developit.shoppinglist.domain.user.UserRepository
+import pl.developit.shoppinglist.domain.UserRepository
 
 class MainActivity : AppCompatActivity(), MainCommunicator {
 

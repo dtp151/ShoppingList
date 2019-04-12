@@ -7,9 +7,9 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.data.models.Product
-import pl.developit.shoppinglist.data.product.cloud.RemoteProductSource
 import pl.developit.shoppinglist.data.product.local.LocalDatabaseDAO
-import pl.developit.shoppinglist.domain.product.ProductRepository
+import pl.developit.shoppinglist.data.product.remote.RemoteProductSource
+import pl.developit.shoppinglist.domain.ProductRepository
 import pl.developit.shoppinglist.presentation.utils.getTimeStamp
 
 class ProductRepositoryImpl(

@@ -8,12 +8,12 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.data.product.ProductRepositoryImpl
-import pl.developit.shoppinglist.data.product.cloud.RemoteProductSource
 import pl.developit.shoppinglist.data.product.local.LocalDatabase
+import pl.developit.shoppinglist.data.product.remote.RemoteProductSource
 import pl.developit.shoppinglist.data.user.UserInterface
 import pl.developit.shoppinglist.data.user.UserRepositoryImpl
-import pl.developit.shoppinglist.domain.product.ProductRepository
-import pl.developit.shoppinglist.domain.user.UserRepository
+import pl.developit.shoppinglist.domain.ProductRepository
+import pl.developit.shoppinglist.domain.UserRepository
 import pl.developit.shoppinglist.presentation.screens.login.LoginViewModel
 import pl.developit.shoppinglist.presentation.screens.shopping.ShoppingFragment
 import pl.developit.shoppinglist.presentation.screens.shopping.ShoppingViewModel

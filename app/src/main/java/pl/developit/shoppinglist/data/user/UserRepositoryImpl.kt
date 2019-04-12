@@ -6,7 +6,7 @@ import io.reactivex.Single
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.data.models.User
 import pl.developit.shoppinglist.data.models.UserRequest
-import pl.developit.shoppinglist.domain.user.UserRepository
+import pl.developit.shoppinglist.domain.UserRepository
 import pl.developit.shoppinglist.presentation.utils.ApiErrorParser
 import pl.developit.shoppinglist.presentation.utils.boolean
 import pl.developit.shoppinglist.presentation.utils.string

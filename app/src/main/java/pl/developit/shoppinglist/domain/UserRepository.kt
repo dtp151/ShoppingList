@@ -1,4 +1,4 @@
-package pl.developit.shoppinglist.domain.user
+package pl.developit.shoppinglist.domain
 
 import io.reactivex.Single
 import pl.developit.shoppinglist.data.models.User

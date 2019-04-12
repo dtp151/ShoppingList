@@ -1,4 +1,4 @@
-package pl.developit.shoppinglist.domain.product
+package pl.developit.shoppinglist.domain
 
 import androidx.lifecycle.LiveData
 import pl.developit.shoppinglist.data.models.Product

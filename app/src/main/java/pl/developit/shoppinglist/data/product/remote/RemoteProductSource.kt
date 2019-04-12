@@ -1,4 +1,4 @@
-package pl.developit.shoppinglist.data.product.cloud
+package pl.developit.shoppinglist.data.product.remote
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper

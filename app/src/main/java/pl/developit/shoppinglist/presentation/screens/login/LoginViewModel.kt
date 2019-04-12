@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import pl.developit.shoppinglist.domain.user.UserRepository
+import pl.developit.shoppinglist.domain.UserRepository
 
 class LoginViewModel(
 		private val userRepository: UserRepository)
