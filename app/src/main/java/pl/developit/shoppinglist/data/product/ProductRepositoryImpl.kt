@@ -7,7 +7,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.data.models.Product
-import pl.developit.shoppinglist.data.product.cloud.CloudInterfaceWrapper
+import pl.developit.shoppinglist.data.product.cloud.CloudInterface
 import pl.developit.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.developit.shoppinglist.domain.product.ProductRepository
 import pl.developit.shoppinglist.domain.user.UserRepository
@@ -16,7 +16,7 @@ import pl.developit.shoppinglist.presentation.utils.getTimeStamp
 class ProductRepositoryImpl(
 		private val userRepository: UserRepository,
 		private val localDatabase: LocalDatabaseDAO,
-		private val cloudInterfaceWrapper: CloudInterfaceWrapper)
+		private val cloudInterface: CloudInterface)
 	: ProductRepository {
 
 	private val disposables = CompositeDisposable()
@@ -69,7 +69,7 @@ class ProductRepositoryImpl(
 	private fun syncDatabases() {
 		val productList = productList.value
 		disposables.add(
-				cloudInterfaceWrapper.synchronizeProducts(userRepository.getUid(), productList)
+				cloudInterface.synchronizeProducts(userRepository.getUid(), productList)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.doOnSubscribe { isSyncing.postValue(true) }
@@ -89,7 +89,7 @@ class ProductRepositoryImpl(
 
 	private fun deleteRemotelyAndLocally(product: Product) {
 		disposables.add(
-				cloudInterfaceWrapper.deleteProduct(userRepository.getUid(), product.id)
+				cloudInterface.deleteProduct(userRepository.getUid(), product.id)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribeBy(
@@ -99,7 +99,7 @@ class ProductRepositoryImpl(
 
 	private fun insertRemotelyAndMarkSyncedLocally(product: Product) {
 		disposables.add(
-				cloudInterfaceWrapper.addProduct(userRepository.getUid(), product.id, product.name)
+				cloudInterface.addProduct(userRepository.getUid(), product.id, product.name)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
 						.subscribeBy(

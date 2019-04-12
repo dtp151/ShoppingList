@@ -8,8 +8,6 @@ import org.koin.dsl.module
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.data.product.ProductRepositoryImpl
 import pl.developit.shoppinglist.data.product.cloud.CloudInterface
-import pl.developit.shoppinglist.data.product.cloud.CloudInterfaceWrapper
-import pl.developit.shoppinglist.data.product.cloud.CloudInterfaceWrapperImpl
 import pl.developit.shoppinglist.data.product.local.LocalDatabase
 import pl.developit.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.developit.shoppinglist.data.user.UserInterface
@@ -28,7 +26,6 @@ val viewModelFactoryModule = module {
 val productsModule = module {
 	single<LocalDatabaseDAO> { LocalDatabase.Builder.build(androidContext()) }
 	single<CloudInterface> { CloudInterface.Builder.build() }
-	single<CloudInterfaceWrapper> { CloudInterfaceWrapperImpl(get()) }
 	factory<ProductRepository> { ProductRepositoryImpl(get(), get(), get()) } // TODO change to scoped life to ShoppingFragment
 }
 

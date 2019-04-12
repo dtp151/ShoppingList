@@ -59,6 +59,6 @@ interface CloudInterface {
 
 	@POST("synchronizeProducts")
 	fun synchronizeProducts(@Header("uid") uid: String,
-	                        @Body products: List<Product>)
+	                        @Body products: List<Product>?)
 			: Single<List<Product>>
 }
