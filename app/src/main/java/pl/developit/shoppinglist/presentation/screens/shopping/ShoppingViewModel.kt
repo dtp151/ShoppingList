@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.domain.ProductRepository
 import pl.developit.shoppinglist.domain.UserRepository
+import pl.developit.shoppinglist.presentation.utils.notifyChanged
 import pl.developit.shoppinglist.presentation.utils.observeOnce
 
 class ShoppingViewModel(
@@ -69,10 +70,6 @@ class ShoppingViewModel(
 	fun logOut() {
 		userRepository.logOut()
 		productRepository.clearLocalDatabase()
-	}
-
-	private fun MutableLiveData<List<Product>>.notifyChanged() {
-		value = value
 	}
 
 }
