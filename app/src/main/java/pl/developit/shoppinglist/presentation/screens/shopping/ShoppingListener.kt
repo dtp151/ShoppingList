@@ -1,10 +1,9 @@
 package pl.developit.shoppinglist.presentation.screens.shopping
 
-import pl.developit.shoppinglist.data.models.Product
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import pl.developit.shoppinglist.presentation.screens.shopping.adapters.ProductAdapter
 
 
-interface ShoppingListener {
+interface ShoppingListener: ProductAdapter.OnProductClickCallback, SwipeRefreshLayout.OnRefreshListener {
 	fun onAddBtnClick(productName: String)
-
-	fun onProductClick(): (Product) -> Unit
 }

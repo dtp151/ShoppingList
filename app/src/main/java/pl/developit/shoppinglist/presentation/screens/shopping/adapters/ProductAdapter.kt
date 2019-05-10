@@ -11,14 +11,14 @@ import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.presentation.screens.shopping.viewholders.ProductViewHolder
 
-@BindingAdapter("productList", "onItemClick")
-fun RecyclerView.setProducts(productList: List<Product>?, onProductClick: (Product) -> Unit) {
+@BindingAdapter("productList", "onProductClick")
+fun RecyclerView.setProducts(productList: List<Product>?, onProductClickCallback: ProductAdapter.OnProductClickCallback) {
 	if (adapter == null)
-		adapter = ProductAdapter(onProductClick)
+		adapter = ProductAdapter(onProductClickCallback)
 	(adapter as ProductAdapter).submitList(productList)
 }
 
-class ProductAdapter(private val onProductClick: (Product) -> Unit)
+class ProductAdapter(private val onProductClickCallback: OnProductClickCallback)
 	: ListAdapter<Product, ProductViewHolder>(ProductDiff()) {
 
 	class ProductDiff : DiffUtil.ItemCallback<Product>() {
@@ -52,7 +52,7 @@ class ProductAdapter(private val onProductClick: (Product) -> Unit)
 	}
 
 	override fun onCreateViewHolder(viewGroup: ViewGroup, i: Int): ProductViewHolder {
-		return ProductViewHolder(DataBindingUtil.inflate(LayoutInflater.from(viewGroup.context), R.layout.item_product, viewGroup, false), onProductClick)
+		return ProductViewHolder(DataBindingUtil.inflate(LayoutInflater.from(viewGroup.context), R.layout.item_product, viewGroup, false), onProductClickCallback)
 	}
 
 	override fun onBindViewHolder(viewHolder: ProductViewHolder, i: Int) {
@@ -63,4 +63,7 @@ class ProductAdapter(private val onProductClick: (Product) -> Unit)
 		return getItem(position).id
 	}
 
+	interface OnProductClickCallback {
+		fun onProductClick(product: Product)
+	}
 }

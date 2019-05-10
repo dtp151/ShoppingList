@@ -25,7 +25,7 @@
             android:checkMark="?android:attr/listChoiceIndicatorMultiple"
             android:checked="@{product.checked}"
             android:gravity="center_vertical"
-            android:onClick="@{(view) -> listener.onClick(view)}"
+            android:onClick="@{(view)->listener.onClick(view)}"
             android:paddingStart="10dp"
             android:paddingTop="5dp"
             android:paddingEnd="10dp"

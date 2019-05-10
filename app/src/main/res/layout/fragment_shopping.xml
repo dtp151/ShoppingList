@@ -13,10 +13,6 @@
             name="listener"
             type="pl.developit.shoppinglist.presentation.screens.shopping.ShoppingListener" />
 
-        <variable
-            name="onRefreshListener"
-            type="androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener" />
-
     </data>
 
     <LinearLayout
@@ -30,13 +26,13 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             app:isRefreshing="@{viewModel.isRefreshing}"
-            app:onRefreshListener="@{onRefreshListener}">
+            app:onRefreshListener="@{listener}">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:onItemClick="@{listener.onProductClick()}"
+                app:onProductClick="@{listener}"
                 app:productList="@{viewModel.productList}"
                 app:reverseLayout="true"
                 app:stackFromEnd="true"

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.view.ActionMode
 import androidx.databinding.DataBindingUtil
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import org.koin.android.scope.currentScope
 import org.koin.android.viewmodel.ext.android.viewModel
 import pl.developit.shoppinglist.R
@@ -15,7 +14,7 @@ import pl.developit.shoppinglist.presentation.utils.ActionModeManager
 import pl.developit.shoppinglist.presentation.utils.BaseFragment
 import pl.developit.shoppinglist.presentation.utils.BundleDelegate
 
-class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.OnRefreshListener, ActionModeManager.Callback {
+class ShoppingFragment : BaseFragment(), ShoppingListener, ActionModeManager.Callback {
 
 	private var Bundle.selectedProducts by BundleDelegate.HashSet<Long>("selected_products")
 	private var Bundle.newProductName by BundleDelegate.String("new_product_name")
@@ -36,7 +35,6 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 			it.lifecycleOwner = this
 			it.viewModel = viewModel
 			it.listener = this
-			it.onRefreshListener = this
 		}
 
 		viewModel.getProducts(this)
@@ -73,6 +71,16 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 		else -> super.onOptionsItemSelected(item)
 	}
 
+	override fun onAddBtnClick(productName: String) {
+		viewModel.addNewProduct(productName)
+		viewModel.clearNewProductName()
+	}
+
+	override fun onProductClick(product: Product) {
+		viewModel.invalidateSelectionFor(product)
+		actionModeManager.invalidateCount()
+	}
+
 	override fun onRefresh() {
 		viewModel.syncProducts()
 	}
@@ -91,18 +99,6 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, SwipeRefreshLayout.On
 
 	override fun onActionModeDestroyed() {
 		viewModel.deselectAllProducts()
-	}
-
-	override fun onAddBtnClick(productName: String) {
-		viewModel.addNewProduct(productName)
-		viewModel.clearNewProductName()
-	}
-
-	override fun onProductClick(): (Product) -> Unit {
-		return { product ->
-			viewModel.invalidateSelectionFor(product)
-			actionModeManager.invalidateCount()
-		}
 	}
 
 	private fun showLogoutDecisionDialog() {
