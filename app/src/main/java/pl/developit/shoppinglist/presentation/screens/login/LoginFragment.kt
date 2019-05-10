@@ -18,7 +18,6 @@ class LoginFragment : BaseFragment(), LoginListener {
 	private var Bundle.email by BundleDelegate.String("email")
 	private var Bundle.password by BundleDelegate.String("password")
 
-
 	private val viewModel by viewModel<LoginViewModel>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,8 +32,12 @@ class LoginFragment : BaseFragment(), LoginListener {
 			it.viewModel = viewModel
 		}
 
-		viewModel.loginResult.observe(this, startShoppingFragment())
-		viewModel.errorMessage.observe(this, showError())
+		viewModel.liveState.observe(this, Observer {
+			when (it) {
+				is LoginViewModel.LoginState.Success -> mainCommunicator.showShoppingFragment()
+				is LoginViewModel.LoginState.Error -> showError(it.error)
+			}
+		})
 		return binding.root
 	}
 
@@ -60,13 +63,6 @@ class LoginFragment : BaseFragment(), LoginListener {
 		viewModel.register()
 	}
 
-	private fun startShoppingFragment(): Observer<Boolean> {
-		return Observer { mainCommunicator.showShoppingFragment() }
-	}
-
-	private fun showError(): Observer<String> {
-		return Observer { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
-	}
-
+	private fun showError(error: String) = Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
 
 }

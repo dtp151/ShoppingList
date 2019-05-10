@@ -3,7 +3,8 @@ package pl.developit.shoppinglist.presentation.screens.login
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.domain.UserRepository
 
@@ -16,8 +17,14 @@ class LoginViewModel(
 	val isLoading = MutableLiveData<Boolean>().apply { value = false }
 	val isLoginRememberable = MutableLiveData<Boolean>().apply { value = userRepository.isLoginRememberable() }
 
-	val loginResult = MutableLiveData<Boolean>()
-	val errorMessage = MutableLiveData<String>()
+	val liveState = MutableLiveData<LoginState>()
+
+	private val disposables = CompositeDisposable()
+
+	override fun onCleared() {
+		super.onCleared()
+		disposables.clear()
+	}
 
 	fun logIn() {
 		userRepository.logIn(isLoginRememberable.value, email.value, password.value)
@@ -25,10 +32,10 @@ class LoginViewModel(
 				.observeOn(AndroidSchedulers.mainThread())
 				.doOnSubscribe { isLoading.value = true }
 				.doFinally { isLoading.value = false }
-				.subscribeBy(
-						onSuccess = { loginResult.value = true },
-						onError = { errorMessage.value = it.localizedMessage }
-				)
+				.subscribe(
+						{ liveState.value = LoginState.Success },
+						{ liveState.value = LoginState.Error(it.localizedMessage) }
+				).addTo(disposables)
 	}
 
 	fun register() {
@@ -37,14 +44,23 @@ class LoginViewModel(
 				.observeOn(AndroidSchedulers.mainThread())
 				.doOnSubscribe { isLoading.value = true }
 				.doFinally { isLoading.value = false }
-				.subscribeBy(
-						onSuccess = { loginResult.value = true },
-						onError = { errorMessage.value = it.localizedMessage }
-				)
+				.subscribe(
+						{ liveState.value = LoginState.Success },
+						{ liveState.value = LoginState.Error(it.localizedMessage) }
+				).addTo(disposables)
 	}
 
 	fun isUserLogged(): Boolean {
 		return userRepository.isLoggedIn()
+	}
+
+	sealed class LoginState {
+		object Success : LoginState()
+		class Error(val error: String) : LoginState()
+	}
+
+	private fun Disposable.addTo(disposables: CompositeDisposable) {
+		disposables.add(this)
 	}
 
 }
