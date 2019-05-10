@@ -50,10 +50,6 @@ class LoginViewModel(
 				).addTo(disposables)
 	}
 
-	fun isUserLogged(): Boolean {
-		return userRepository.isLoggedIn()
-	}
-
 	sealed class LoginState {
 		object Success : LoginState()
 		class Error(val error: String) : LoginState()
