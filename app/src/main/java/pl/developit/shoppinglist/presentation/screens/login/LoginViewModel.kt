@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.domain.UserRepository
 
@@ -53,10 +53,6 @@ class LoginViewModel(
 	sealed class LoginState {
 		object Success : LoginState()
 		class Error(val error: String) : LoginState()
-	}
-
-	private fun Disposable.addTo(disposables: CompositeDisposable) {
-		disposables.add(this)
 	}
 
 }

@@ -1,12 +1,12 @@
 package pl.developit.shoppinglist.domain
 
-import androidx.lifecycle.LiveData
+import io.reactivex.Observable
 import pl.developit.shoppinglist.data.models.Product
+import pl.developit.shoppinglist.data.product.ProductRepositoryImpl
 
 interface ProductRepository {
 
-	val productList: LiveData<List<Product>>
-	val isSyncing: LiveData<Boolean>
+	fun observe(): Observable<ProductRepositoryImpl.State>
 
 	fun sync()
 

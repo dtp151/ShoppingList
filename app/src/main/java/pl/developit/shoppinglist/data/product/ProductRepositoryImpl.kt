@@ -1,11 +1,12 @@
 package pl.developit.shoppinglist.data.product
 
-import androidx.lifecycle.MutableLiveData
 import com.crashlytics.android.Crashlytics
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.developit.shoppinglist.data.product.remote.RemoteProductSource
@@ -20,15 +21,21 @@ class ProductRepositoryImpl(
 
 	private val disposables = CompositeDisposable()
 
-	override val productList = MutableLiveData<List<Product>>()
-	override val isSyncing = MutableLiveData<Boolean>()
+	private val source = BehaviorSubject.create<State>()
 
 	init {
 		observeLocalTable()
 	}
 
+	override fun observe(): Observable<State> = source
+
 	override fun sync() {
-		syncDatabases()
+		disposables.add(localProductSource.selectAllOnce()
+				.subscribeOn(Schedulers.io())
+				.doOnSubscribe { source.onNext(State.Syncing) }
+				.subscribeBy(
+						onSuccess = { localProducts -> syncRemotely(localProducts) },
+						onError = { Crashlytics.logException(it) }))
 	}
 
 	override fun insert(name: String) {
@@ -56,23 +63,20 @@ class ProductRepositoryImpl(
 		disposables.clear()
 	}
 
-
 	private fun observeLocalTable() {
 		disposables.add(
 				localProductSource.selectAll()
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
-						.subscribeBy(onNext = { list -> productList.postValue(list) }))
+						.subscribe { list -> source.onNext(State.Success(list)) })
 	}
 
-	private fun syncDatabases() {
-		val productList = productList.value
+	private fun syncRemotely(productList: List<Product>) {
 		disposables.add(
 				remoteProductSource.synchronizeProducts(uid, productList)
 						.subscribeOn(Schedulers.io())
 						.observeOn(Schedulers.io())
-						.doOnSubscribe { isSyncing.postValue(true) }
-						.doFinally { isSyncing.postValue(false) }
+						.doFinally { source.onNext(State.Synced) }
 						.subscribeBy(
 								onSuccess = { newProductList -> replaceLocally(productList, newProductList) },
 								onError = { Crashlytics.logException(it) }))
@@ -139,6 +143,12 @@ class ProductRepositoryImpl(
 				localProductSource.delete(product)
 						.subscribeOn(Schedulers.io())
 						.subscribe())
+	}
+
+	sealed class State {
+		class Success(val products: List<Product>) : State()
+		object Syncing : State()
+		object Synced : State()
 	}
 
 }

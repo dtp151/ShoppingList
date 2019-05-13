@@ -37,7 +37,7 @@ class ShoppingFragment : BaseFragment(), ShoppingListener, ActionModeManager.Cal
 			it.listener = this
 		}
 
-		viewModel.getProducts(this)
+		viewModel.observeProducts()
 
 		return binding.root
 	}

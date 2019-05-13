@@ -1,11 +1,16 @@
 package pl.developit.shoppinglist.presentation.screens.shopping
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.data.models.Product
+import pl.developit.shoppinglist.data.product.ProductRepositoryImpl.State.*
 import pl.developit.shoppinglist.domain.ProductRepository
 import pl.developit.shoppinglist.domain.UserRepository
 import pl.developit.shoppinglist.presentation.utils.notifyChanged
-import pl.developit.shoppinglist.presentation.utils.observeOnce
 
 class ShoppingViewModel(
 		private val productRepository: ProductRepository,
@@ -17,19 +22,29 @@ class ShoppingViewModel(
 	//bindings
 	val newProductName = MutableLiveData<String>()
 	val productList = MutableLiveData<List<Product>>()
-	val isRefreshing: LiveData<Boolean> = productRepository.isSyncing
+	val isRefreshing = MutableLiveData<Boolean>()
+
+	private val disposables = CompositeDisposable()
 
 	override fun onCleared() {
 		super.onCleared()
+		disposables.clear()
 		productRepository.clearDisposables()
 	}
 
-	fun getProducts(owner: LifecycleOwner) {
-		productRepository.productList.observe(owner, Observer { list ->
-			productList.value = list.filter { it.status != Product.Status.DELETED }
-			productList.value?.map { it.isChecked = selectedProducts.contains(it.id) }
-		})
-		productRepository.productList.observeOnce(owner, Observer { productRepository.sync() })
+	fun observeProducts() {
+		productRepository.observe()
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.doFinally { productRepository.sync() }
+				.subscribe { state ->
+					when (state) {
+						is Success -> productList.updateWith(state.products)
+						Syncing -> isRefreshing.value = true
+						Synced -> isRefreshing.value = false
+					}
+				}
+				.addTo(disposables)
 	}
 
 	fun addNewProduct(name: String) {
@@ -72,4 +87,8 @@ class ShoppingViewModel(
 		productRepository.clearLocalDatabase()
 	}
 
+	private fun  MutableLiveData<List<Product>>.updateWith(products: List<Product>) {
+		value = products.filter { it.status != Product.Status.DELETED }
+		value?.map { it.isChecked = selectedProducts.contains(it.id) }
+	}
 }

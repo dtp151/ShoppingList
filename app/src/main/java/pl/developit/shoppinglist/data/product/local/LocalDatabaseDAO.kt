@@ -14,6 +14,9 @@ interface LocalDatabaseDAO {
 	@Query("Select * from products")
 	fun selectAll(): Observable<List<Product>>
 
+	@Query("Select * from products")
+	fun selectAllOnce(): Single<List<Product>>
+
 	@Insert(onConflict = REPLACE)
 	fun insert(product: Product): Completable
 
