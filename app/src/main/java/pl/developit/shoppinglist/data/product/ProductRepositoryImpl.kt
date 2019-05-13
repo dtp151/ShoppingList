@@ -21,18 +21,18 @@ class ProductRepositoryImpl(
 
 	private val disposables = CompositeDisposable()
 
-	private val source = BehaviorSubject.create<State>()
+	private val subject = BehaviorSubject.create<State>()
 
 	init {
 		observeLocalTable()
 	}
 
-	override fun observe(): Observable<State> = source
+	override fun observe(): Observable<State> = subject
 
 	override fun sync() {
 		localProductSource.selectAllOnce()
 				.subscribeOn(Schedulers.io())
-				.doOnSubscribe { source.onNext(State.Syncing) }
+				.doOnSubscribe { subject.onNext(State.Syncing) }
 				.subscribe(
 						{ localProducts -> syncRemotely(localProducts) },
 						{ Crashlytics.logException(it) })
@@ -68,7 +68,7 @@ class ProductRepositoryImpl(
 		localProductSource.selectAll()
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
-				.subscribe { list -> source.onNext(State.Success(list)) }
+				.subscribe { list -> subject.onNext(State.Success(list)) }
 				.addTo(disposables)
 	}
 
@@ -76,7 +76,7 @@ class ProductRepositoryImpl(
 		remoteProductSource.synchronizeProducts(uid, productList)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
-				.doFinally { source.onNext(State.Synced) }
+				.doFinally { subject.onNext(State.Synced) }
 				.subscribe(
 						{ newProductList -> replaceLocally(productList, newProductList) },
 						{ Crashlytics.logException(it) })
