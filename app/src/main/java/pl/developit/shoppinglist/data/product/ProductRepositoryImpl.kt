@@ -4,6 +4,7 @@ import com.crashlytics.android.Crashlytics
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
@@ -30,12 +31,13 @@ class ProductRepositoryImpl(
 	override fun observe(): Observable<State> = source
 
 	override fun sync() {
-		disposables.add(localProductSource.selectAllOnce()
+		localProductSource.selectAllOnce()
 				.subscribeOn(Schedulers.io())
 				.doOnSubscribe { source.onNext(State.Syncing) }
 				.subscribeBy(
 						onSuccess = { localProducts -> syncRemotely(localProducts) },
-						onError = { Crashlytics.logException(it) }))
+						onError = { Crashlytics.logException(it) })
+				.addTo(disposables)
 	}
 
 	override fun insert(name: String) {
@@ -45,18 +47,18 @@ class ProductRepositoryImpl(
 
 	override fun markAsDeleted(product: Product) {
 		product.status = Product.Status.DELETED
-		disposables.add(
-				localProductSource.update(product)
-						.subscribeOn(Schedulers.io())
-						.observeOn(Schedulers.io())
-						.subscribeBy(onComplete = { deleteRemotelyAndLocally(product) }))
+		localProductSource.update(product)
+				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
+				.subscribeBy(onComplete = { deleteRemotelyAndLocally(product) })
+				.addTo(disposables)
 	}
 
 	override fun clearLocalDatabase() {
-		disposables.add(
-				Completable.fromAction { localProductSource.clearTable() }
-						.subscribeOn(Schedulers.io())
-						.subscribe())
+		Completable.fromAction { localProductSource.clearTable() }
+				.subscribeOn(Schedulers.io())
+				.subscribe()
+				.addTo(disposables)
 	}
 
 	override fun clearDisposables() {
@@ -64,85 +66,85 @@ class ProductRepositoryImpl(
 	}
 
 	private fun observeLocalTable() {
-		disposables.add(
-				localProductSource.selectAll()
-						.subscribeOn(Schedulers.io())
-						.observeOn(Schedulers.io())
-						.subscribe { list -> source.onNext(State.Success(list)) })
+		localProductSource.selectAll()
+				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
+				.subscribe { list -> source.onNext(State.Success(list)) }
+				.addTo(disposables)
 	}
 
 	private fun syncRemotely(productList: List<Product>) {
-		disposables.add(
-				remoteProductSource.synchronizeProducts(uid, productList)
-						.subscribeOn(Schedulers.io())
-						.observeOn(Schedulers.io())
-						.doFinally { source.onNext(State.Synced) }
-						.subscribeBy(
-								onSuccess = { newProductList -> replaceLocally(productList, newProductList) },
-								onError = { Crashlytics.logException(it) }))
+		remoteProductSource.synchronizeProducts(uid, productList)
+				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
+				.doFinally { source.onNext(State.Synced) }
+				.subscribeBy(
+						onSuccess = { newProductList -> replaceLocally(productList, newProductList) },
+						onError = { Crashlytics.logException(it) })
+				.addTo(disposables)
 	}
 
 	private fun insertLocallyAndRemotely(product: Product) {
-		disposables.add(
-				localProductSource.insert(product)
-						.subscribeOn(Schedulers.io())
-						.observeOn(Schedulers.io())
-						.subscribeBy(onComplete = { insertRemotelyAndMarkSyncedLocally(product) }))
+		localProductSource.insert(product)
+				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
+				.subscribeBy(onComplete = { insertRemotelyAndMarkSyncedLocally(product) })
+				.addTo(disposables)
 	}
 
 	private fun deleteRemotelyAndLocally(product: Product) {
-		disposables.add(
-				remoteProductSource.deleteProduct(uid, product.id)
-						.subscribeOn(Schedulers.io())
-						.observeOn(Schedulers.io())
-						.subscribeBy(
-								onSuccess = { deleteLocally(product) },
-								onError = { Crashlytics.logException(it) }))
+		remoteProductSource.deleteProduct(uid, product.id)
+				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
+				.subscribeBy(
+						onSuccess = { deleteLocally(product) },
+						onError = { Crashlytics.logException(it) })
+				.addTo(disposables)
 	}
 
 	private fun insertRemotelyAndMarkSyncedLocally(product: Product) {
-		disposables.add(
-				remoteProductSource.addProduct(uid, product.id, product.name)
-						.subscribeOn(Schedulers.io())
-						.observeOn(Schedulers.io())
-						.subscribeBy(
-								onSuccess = {
-									product.status = Product.Status.SYNCED
-									updateLocally(product)
-								},
-								onError = { Crashlytics.logException(it) }))
+		remoteProductSource.addProduct(uid, product.id, product.name)
+				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
+				.subscribeBy(
+						onSuccess = {
+							product.status = Product.Status.SYNCED
+							updateLocally(product)
+						},
+						onError = { Crashlytics.logException(it) })
+				.addTo(disposables)
 	}
 
 	private fun replaceLocally(oldProducts: List<Product>?, newProducts: List<Product>) {
-		disposables.add(
-				localProductSource.delete(oldProducts)
-						.subscribeOn(Schedulers.io())
-						.observeOn(Schedulers.io())
-						.subscribe {
-							newProducts.map { it.status = Product.Status.SYNCED }
-							insertLocally(newProducts)
-						})
+		localProductSource.delete(oldProducts)
+				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
+				.subscribe {
+					newProducts.map { it.status = Product.Status.SYNCED }
+					insertLocally(newProducts)
+				}
+				.addTo(disposables)
 	}
 
 	private fun insertLocally(products: List<Product>) {
-		disposables.add(
-				localProductSource.insert(products)
-						.subscribeOn(Schedulers.io())
-						.subscribe())
+		localProductSource.insert(products)
+				.subscribeOn(Schedulers.io())
+				.subscribe()
+				.addTo(disposables)
 	}
 
 	private fun updateLocally(product: Product) {
-		disposables.add(
-				localProductSource.update(product)
-						.subscribeOn(Schedulers.io())
-						.subscribe())
+		localProductSource.update(product)
+				.subscribeOn(Schedulers.io())
+				.subscribe()
+				.addTo(disposables)
 	}
 
 	private fun deleteLocally(product: Product) {
-		disposables.add(
-				localProductSource.delete(product)
-						.subscribeOn(Schedulers.io())
-						.subscribe())
+		localProductSource.delete(product)
+				.subscribeOn(Schedulers.io())
+				.subscribe()
+				.addTo(disposables)
 	}
 
 	sealed class State {
