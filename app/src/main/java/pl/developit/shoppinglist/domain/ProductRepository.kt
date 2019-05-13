@@ -2,11 +2,10 @@ package pl.developit.shoppinglist.domain
 
 import io.reactivex.Observable
 import pl.developit.shoppinglist.data.models.Product
-import pl.developit.shoppinglist.data.product.ProductRepositoryImpl
 
 interface ProductRepository {
 
-	fun observe(): Observable<ProductRepositoryImpl.State>
+	fun observe(): Observable<State>
 
 	fun sync()
 
@@ -18,4 +17,9 @@ interface ProductRepository {
 
 	fun clearDisposables()
 
+	sealed class State {
+		class Success(val products: List<Product>) : State()
+		object Syncing : State()
+		object Synced : State()
+	}
 }

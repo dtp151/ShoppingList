@@ -11,6 +11,7 @@ import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.developit.shoppinglist.data.product.remote.RemoteProductSource
 import pl.developit.shoppinglist.domain.ProductRepository
+import pl.developit.shoppinglist.domain.ProductRepository.State
 import pl.developit.shoppinglist.presentation.utils.getTimeStamp
 
 class ProductRepositoryImpl(
@@ -139,11 +140,4 @@ class ProductRepositoryImpl(
 				.subscribe()
 				.addTo(disposables)
 	}
-
-	sealed class State {
-		class Success(val products: List<Product>) : State()
-		object Syncing : State()
-		object Synced : State()
-	}
-
 }

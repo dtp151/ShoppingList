@@ -7,8 +7,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.data.models.Product
-import pl.developit.shoppinglist.data.product.ProductRepositoryImpl.State.*
 import pl.developit.shoppinglist.domain.ProductRepository
+import pl.developit.shoppinglist.domain.ProductRepository.State.*
 import pl.developit.shoppinglist.domain.UserRepository
 import pl.developit.shoppinglist.presentation.utils.notifyChanged
 
@@ -87,7 +87,7 @@ class ShoppingViewModel(
 		productRepository.clearLocalDatabase()
 	}
 
-	private fun  MutableLiveData<List<Product>>.updateWith(products: List<Product>) {
+	private fun MutableLiveData<List<Product>>.updateWith(products: List<Product>) {
 		value = products.filter { it.status != Product.Status.DELETED }
 		value?.map { it.isChecked = selectedProducts.contains(it.id) }
 	}
