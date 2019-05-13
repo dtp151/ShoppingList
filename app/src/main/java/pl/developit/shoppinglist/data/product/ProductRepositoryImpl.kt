@@ -5,7 +5,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import pl.developit.shoppinglist.data.models.Product
@@ -34,9 +33,9 @@ class ProductRepositoryImpl(
 		localProductSource.selectAllOnce()
 				.subscribeOn(Schedulers.io())
 				.doOnSubscribe { source.onNext(State.Syncing) }
-				.subscribeBy(
-						onSuccess = { localProducts -> syncRemotely(localProducts) },
-						onError = { Crashlytics.logException(it) })
+				.subscribe(
+						{ localProducts -> syncRemotely(localProducts) },
+						{ Crashlytics.logException(it) })
 				.addTo(disposables)
 	}
 
@@ -50,7 +49,7 @@ class ProductRepositoryImpl(
 		localProductSource.update(product)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
-				.subscribeBy(onComplete = { deleteRemotelyAndLocally(product) })
+				.subscribe { deleteRemotelyAndLocally(product) }
 				.addTo(disposables)
 	}
 
@@ -78,9 +77,9 @@ class ProductRepositoryImpl(
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
 				.doFinally { source.onNext(State.Synced) }
-				.subscribeBy(
-						onSuccess = { newProductList -> replaceLocally(productList, newProductList) },
-						onError = { Crashlytics.logException(it) })
+				.subscribe(
+						{ newProductList -> replaceLocally(productList, newProductList) },
+						{ Crashlytics.logException(it) })
 				.addTo(disposables)
 	}
 
@@ -88,7 +87,7 @@ class ProductRepositoryImpl(
 		localProductSource.insert(product)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
-				.subscribeBy(onComplete = { insertRemotelyAndMarkSyncedLocally(product) })
+				.subscribe { insertRemotelyAndMarkSyncedLocally(product) }
 				.addTo(disposables)
 	}
 
@@ -96,9 +95,9 @@ class ProductRepositoryImpl(
 		remoteProductSource.deleteProduct(uid, product.id)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
-				.subscribeBy(
-						onSuccess = { deleteLocally(product) },
-						onError = { Crashlytics.logException(it) })
+				.subscribe(
+						{ deleteLocally(product) },
+						{ Crashlytics.logException(it) })
 				.addTo(disposables)
 	}
 
@@ -106,12 +105,9 @@ class ProductRepositoryImpl(
 		remoteProductSource.addProduct(uid, product.id, product.name)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
-				.subscribeBy(
-						onSuccess = {
-							product.status = Product.Status.SYNCED
-							updateLocally(product)
-						},
-						onError = { Crashlytics.logException(it) })
+				.subscribe(
+						{ product.status = Product.Status.SYNCED; updateLocally(product) },
+						{ Crashlytics.logException(it) })
 				.addTo(disposables)
 	}
 
@@ -119,10 +115,7 @@ class ProductRepositoryImpl(
 		localProductSource.delete(oldProducts)
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
-				.subscribe {
-					newProducts.map { it.status = Product.Status.SYNCED }
-					insertLocally(newProducts)
-				}
+				.subscribe { newProducts.map { it.status = Product.Status.SYNCED }; insertLocally(newProducts) }
 				.addTo(disposables)
 	}
 
