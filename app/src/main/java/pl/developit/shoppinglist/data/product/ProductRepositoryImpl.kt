@@ -6,7 +6,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.developit.shoppinglist.data.product.remote.RemoteProductSource
@@ -21,7 +21,7 @@ class ProductRepositoryImpl(
 
 	private val disposables = CompositeDisposable()
 
-	private val subject = BehaviorSubject.create<State>()
+	private val subject = PublishSubject.create<State>()
 
 	init {
 		observeLocalTable()
