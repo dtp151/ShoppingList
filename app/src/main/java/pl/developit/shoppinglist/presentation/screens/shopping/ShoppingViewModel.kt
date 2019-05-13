@@ -36,7 +36,7 @@ class ShoppingViewModel(
 		productRepository.observe()
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
-				.doFinally { productRepository.sync() }
+				.doOnSubscribe { productRepository.sync() }
 				.subscribe { state ->
 					when (state) {
 						is Success -> productList.updateWith(state.products)
