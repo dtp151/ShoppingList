@@ -1,4 +1,4 @@
-package pl.developit.shoppinglist.data.user
+package pl.developit.shoppinglist.domain
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -6,17 +6,17 @@ import io.reactivex.Single
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.data.models.User
 import pl.developit.shoppinglist.data.models.UserRequest
-import pl.developit.shoppinglist.domain.UserRepository
+import pl.developit.shoppinglist.data.user.UserInterface
 import pl.developit.shoppinglist.presentation.utils.ApiErrorParser
 import pl.developit.shoppinglist.presentation.utils.boolean
 import pl.developit.shoppinglist.presentation.utils.string
 
-class UserRepositoryImpl(
+class UserInteractor(
 		private val context: Context,
 		private val sharedPrefs: SharedPreferences,
 		private val userInterface: UserInterface,
 		private val apiErrorParser: ApiErrorParser)
-	: UserRepository {
+	: UserUseCases {
 
 	private var SharedPreferences.uid by sharedPrefs.string()
 	private var SharedPreferences.isLogInRememberable by sharedPrefs.boolean()

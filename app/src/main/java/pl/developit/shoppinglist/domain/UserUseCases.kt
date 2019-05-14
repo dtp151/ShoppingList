@@ -3,7 +3,7 @@ package pl.developit.shoppinglist.domain
 import io.reactivex.Single
 import pl.developit.shoppinglist.data.models.User
 
-interface UserRepository {
+interface UserUseCases {
 	fun logIn(isLoginRememberable: Boolean?, email: String?, password: String?): Single<User>
 
 	fun register(email: String?, password: String?): Single<User>
@@ -19,5 +19,4 @@ interface UserRepository {
 	fun getRememberedPassword(): String
 
 	fun logOut()
-
 }

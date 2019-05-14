@@ -3,7 +3,7 @@ package pl.developit.shoppinglist.domain
 import io.reactivex.Observable
 import pl.developit.shoppinglist.data.models.Product
 
-interface ProductRepository {
+interface ProductUseCases {
 
 	fun observe(): Observable<State>
 

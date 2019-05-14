@@ -6,16 +6,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import pl.developit.shoppinglist.domain.UserRepository
+import pl.developit.shoppinglist.domain.UserUseCases
 
-class LoginViewModel(
-		private val userRepository: UserRepository)
-	: ViewModel() {
+class LoginViewModel(private val userUseCases: UserUseCases) : ViewModel() {
 
-	val email = MutableLiveData<String>().apply { value = userRepository.getRememberedEmail() }
-	val password = MutableLiveData<String>().apply { value = userRepository.getRememberedPassword() }
+	val email = MutableLiveData<String>().apply { value = userUseCases.getRememberedEmail() }
+	val password = MutableLiveData<String>().apply { value = userUseCases.getRememberedPassword() }
 	val isLoading = MutableLiveData<Boolean>().apply { value = false }
-	val isLoginRememberable = MutableLiveData<Boolean>().apply { value = userRepository.isLoginRememberable() }
+	val isLoginRememberable = MutableLiveData<Boolean>().apply { value = userUseCases.isLoginRememberable() }
 
 	val liveState = MutableLiveData<LoginState>()
 
@@ -27,7 +25,7 @@ class LoginViewModel(
 	}
 
 	fun logIn() {
-		userRepository.logIn(isLoginRememberable.value, email.value, password.value)
+		userUseCases.logIn(isLoginRememberable.value, email.value, password.value)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.doOnSubscribe { isLoading.value = true }
@@ -39,7 +37,7 @@ class LoginViewModel(
 	}
 
 	fun register() {
-		userRepository.register(email.value, password.value)
+		userUseCases.register(email.value, password.value)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.doOnSubscribe { isLoading.value = true }

@@ -6,11 +6,11 @@ import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.FragmentManager
 import org.koin.android.ext.android.inject
 import pl.developit.shoppinglist.R
-import pl.developit.shoppinglist.domain.UserRepository
+import pl.developit.shoppinglist.domain.UserUseCases
 
 class MainActivity : AppCompatActivity(), MainCommunicator {
 
-	private val userRepository by inject<UserRepository>()
+	private val userRepository by inject<UserUseCases>()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)

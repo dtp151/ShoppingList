@@ -7,14 +7,14 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import pl.developit.shoppinglist.data.models.Product
-import pl.developit.shoppinglist.domain.ProductRepository
-import pl.developit.shoppinglist.domain.ProductRepository.State.*
-import pl.developit.shoppinglist.domain.UserRepository
+import pl.developit.shoppinglist.domain.ProductUseCases
+import pl.developit.shoppinglist.domain.ProductUseCases.State.*
+import pl.developit.shoppinglist.domain.UserUseCases
 import pl.developit.shoppinglist.presentation.utils.notifyChanged
 
 class ShoppingViewModel(
-		private val productRepository: ProductRepository,
-		private val userRepository: UserRepository
+		private val productUseCases: ProductUseCases,
+		private val userUseCases: UserUseCases
 ) : ViewModel() {
 
 	val selectedProducts = HashSet<Long>()
@@ -29,14 +29,14 @@ class ShoppingViewModel(
 	override fun onCleared() {
 		super.onCleared()
 		disposables.clear()
-		productRepository.clearDisposables()
+		productUseCases.clearDisposables()
 	}
 
 	fun observeProducts() {
-		productRepository.observe()
+		productUseCases.observe()
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
-				.doOnSubscribe { productRepository.sync() }
+				.doOnSubscribe { productUseCases.sync() }
 				.subscribe { state ->
 					when (state) {
 						is Default -> productList.updateWith(state.products)
@@ -48,11 +48,11 @@ class ShoppingViewModel(
 	}
 
 	fun addNewProduct(name: String) {
-		productRepository.insert(name)
+		productUseCases.insert(name)
 	}
 
 	fun syncProducts() {
-		productRepository.sync()
+		productUseCases.sync()
 	}
 
 	fun invalidateSelectionFor(product: Product) {
@@ -66,7 +66,7 @@ class ShoppingViewModel(
 	fun removeCheckedProducts() {
 		productList.value?.forEach { product ->
 			if (selectedProducts.contains(product.id)) {
-				productRepository.markAsDeleted(product)
+				productUseCases.markAsDeleted(product)
 				selectedProducts.remove(product.id)
 			}
 		}
@@ -83,8 +83,8 @@ class ShoppingViewModel(
 	}
 
 	fun logOut() {
-		userRepository.logOut()
-		productRepository.clearLocalDatabase()
+		userUseCases.logOut()
+		productUseCases.clearLocalDatabase()
 	}
 
 	private fun MutableLiveData<List<Product>>.updateWith(products: List<Product>) {

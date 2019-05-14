@@ -1,4 +1,4 @@
-package pl.developit.shoppinglist.data.product
+package pl.developit.shoppinglist.domain
 
 import com.crashlytics.android.Crashlytics
 import io.reactivex.Completable
@@ -10,15 +10,14 @@ import io.reactivex.subjects.PublishSubject
 import pl.developit.shoppinglist.data.models.Product
 import pl.developit.shoppinglist.data.product.local.LocalDatabaseDAO
 import pl.developit.shoppinglist.data.product.remote.RemoteProductSource
-import pl.developit.shoppinglist.domain.ProductRepository
-import pl.developit.shoppinglist.domain.ProductRepository.State
+import pl.developit.shoppinglist.domain.ProductUseCases.State
 import pl.developit.shoppinglist.presentation.utils.getTimeStamp
 
-class ProductRepositoryImpl(
+class ProductInteractor(
 		private val uid: String,
 		private val localProductSource: LocalDatabaseDAO,
 		private val remoteProductSource: RemoteProductSource)
-	: ProductRepository {
+	: ProductUseCases {
 
 	private val disposables = CompositeDisposable()
 
