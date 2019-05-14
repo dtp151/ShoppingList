@@ -39,7 +39,7 @@ class ShoppingViewModel(
 				.doOnSubscribe { productRepository.sync() }
 				.subscribe { state ->
 					when (state) {
-						is Success -> productList.updateWith(state.products)
+						is Default -> productList.updateWith(state.products)
 						Syncing -> isRefreshing.value = true
 						Synced -> isRefreshing.value = false
 					}

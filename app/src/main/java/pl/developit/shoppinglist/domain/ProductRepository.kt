@@ -18,7 +18,7 @@ interface ProductRepository {
 	fun clearDisposables()
 
 	sealed class State {
-		class Success(val products: List<Product>) : State()
+		class Default(val products: List<Product>) : State()
 		object Syncing : State()
 		object Synced : State()
 	}

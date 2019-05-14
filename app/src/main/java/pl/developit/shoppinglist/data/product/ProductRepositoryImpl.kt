@@ -69,7 +69,7 @@ class ProductRepositoryImpl(
 		localProductSource.selectAll()
 				.subscribeOn(Schedulers.io())
 				.observeOn(Schedulers.io())
-				.subscribe { list -> subject.onNext(State.Success(list)) }
+				.subscribe { list -> subject.onNext(State.Default(list)) }
 				.addTo(disposables)
 	}
 
