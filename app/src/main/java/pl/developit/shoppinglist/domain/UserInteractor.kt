@@ -32,11 +32,7 @@ class UserInteractor(
 				val apiKey = context.getString(R.string.api_key)
 				val userRequest = UserRequest(email, password)
 				userInterface.logIn(apiKey, userRequest)
-						.doOnSuccess {
-							sharedPrefs.uid = it?.uid
-							sharedPrefs.isLogInRememberable = isLoginRememberable
-							updateRememberableLogIn(email, password)
-						}
+						.doOnSuccess { updateLogInData(it, isLoginRememberable, email, password) }
 						.onErrorResumeNext { Single.error(apiErrorParser.parse(it)) }
 			}
 		}
@@ -58,31 +54,27 @@ class UserInteractor(
 		}
 	}
 
-	override fun getUid(): String {
-		return sharedPrefs.uid
-	}
+	override fun getUid(): String = sharedPrefs.uid
 
-	override fun isLoggedIn(): Boolean {
-		return sharedPrefs.uid.isNotEmpty()
-	}
+	override fun isLoggedIn(): Boolean = sharedPrefs.uid.isNotEmpty()
 
-	override fun isLoginRememberable(): Boolean {
-		return sharedPrefs.isLogInRememberable
-	}
+	override fun isLoginRememberable(): Boolean = sharedPrefs.isLogInRememberable
 
-	override fun getRememberedEmail(): String {
-		return sharedPrefs.email
-	}
+	override fun getRememberedEmail(): String = sharedPrefs.email
 
-	override fun getRememberedPassword(): String {
-		return sharedPrefs.password
-	}
+	override fun getRememberedPassword(): String = sharedPrefs.password
 
 	override fun logOut() {
 		sharedPrefs.uid = ""
 	}
 
-	private fun updateRememberableLogIn(email: String, password: String) {
+	private fun updateLogInData(user: User, isLoginRememberable: Boolean, email: String, password: String) {
+		sharedPrefs.uid = user.uid
+		sharedPrefs.isLogInRememberable = isLoginRememberable
+		updateRememberable(email, password)
+	}
+
+	private fun updateRememberable(email: String, password: String) {
 		if (sharedPrefs.isLogInRememberable) {
 			sharedPrefs.email = email
 			sharedPrefs.password = password
