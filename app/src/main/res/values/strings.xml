@@ -33,6 +33,6 @@
     <string name="EMAIL_NOT_FOUND" tools:keep="@string/EMAIL_NOT_FOUND">Email not found</string>
     <string name="INVALID_PASSWORD" tools:keep="@string/INVALID_PASSWORD">Invalid Password</string>
     <string name="EMAIL_EXISTS" tools:keep="@string/EMAIL_EXISTS">Email already exists</string>
-    <string name="INVALID_EMAIL" tools:keep="@string/INVALID_EMAIL">Email is invali</string>
+    <string name="INVALID_EMAIL" tools:keep="@string/INVALID_EMAIL">Email is not valid</string>
 
 </resources>
