@@ -20,7 +20,7 @@ class ShoppingViewModel(
 	val selectedProducts = HashSet<Long>()
 
 	//bindings
-	val newProductName = MutableLiveData<String>()
+	val newProductName = MutableLiveData<String>().apply { value = "" }
 	val productList = MutableLiveData<List<Product>>()
 	val isRefreshing = MutableLiveData<Boolean>()
 
