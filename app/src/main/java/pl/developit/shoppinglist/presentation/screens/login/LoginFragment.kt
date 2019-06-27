@@ -55,8 +55,8 @@ class LoginFragment : BaseFragment(), LoginListener {
 		}
 	}
 
-	override fun onLoginBtnClick() {
-		viewModel.logIn()
+	override fun onLoginBtnClick(email: String, password: String, isLoginRememberable: Boolean) {
+		viewModel.logIn(email, password, isLoginRememberable)
 	}
 
 	override fun onRegisterBtnClick() {

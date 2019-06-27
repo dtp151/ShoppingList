@@ -23,11 +23,10 @@ class UserInteractor(
 	private var SharedPreferences.email by sharedPrefs.string()
 	private var SharedPreferences.password by sharedPrefs.string()
 
-	override fun logIn(isLoginRememberable: Boolean?, email: String?, password: String?): Single<User> {
+	override fun logIn(email: String, password: String, isLoginRememberable: Boolean): Single<User> {
 		return when {
-			email.isNullOrBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_email)) }
-			password.isNullOrEmpty() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
-			isLoginRememberable == null -> Single.fromCallable { throw Exception(context.getString(R.string.isloginrememberable_is_null)) }
+			email.isBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_email)) }
+			password.isEmpty() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
 			else -> {
 				val apiKey = context.getString(R.string.api_key)
 				val userRequest = UserRequest(email, password)

@@ -24,8 +24,8 @@ class LoginViewModel(private val userUseCases: UserUseCases) : ViewModel() {
 		disposables.clear()
 	}
 
-	fun logIn() {
-		userUseCases.logIn(isLoginRememberable.value, email.value, password.value)
+	fun logIn(email: String, password: String, isLoginRememberable: Boolean) {
+		userUseCases.logIn(email, password, isLoginRememberable)
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.doOnSubscribe { isLoading.value = true }
