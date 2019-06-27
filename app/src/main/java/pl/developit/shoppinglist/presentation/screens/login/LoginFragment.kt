@@ -32,10 +32,10 @@ class LoginFragment : BaseFragment(), LoginListener {
 			it.viewModel = viewModel
 		}
 
-		viewModel.liveState.observe(this, Observer {
+		viewModel.liveEvent.observe(this, Observer {
 			when (it) {
-				is LoginViewModel.LoginState.Success -> mainCommunicator.showShoppingFragment()
-				is LoginViewModel.LoginState.Error -> showError(it.error)
+				is LoginViewModel.LoginEvent.LogIn -> mainCommunicator.showShoppingFragment()
+				is LoginViewModel.LoginEvent.Error -> showError(it.error)
 			}
 		})
 		return binding.root

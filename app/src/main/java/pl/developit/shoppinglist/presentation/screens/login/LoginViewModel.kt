@@ -15,7 +15,7 @@ class LoginViewModel(private val userUseCases: UserUseCases) : ViewModel() {
 	val isLoading = MutableLiveData<Boolean>().apply { value = false }
 	val isLoginRememberable = MutableLiveData<Boolean>().apply { value = userUseCases.isLoginRememberable() }
 
-	val liveState = MutableLiveData<LoginState>()
+	val liveEvent = MutableLiveData<LoginEvent>()
 
 	private val disposables = CompositeDisposable()
 
@@ -31,14 +31,14 @@ class LoginViewModel(private val userUseCases: UserUseCases) : ViewModel() {
 				.doOnSubscribe { isLoading.value = true }
 				.doFinally { isLoading.value = false }
 				.subscribe(
-						{ liveState.value = LoginState.Success },
-						{ liveState.value = LoginState.Error(it.localizedMessage) }
+						{ liveEvent.value = LoginEvent.LogIn },
+						{ liveEvent.value = LoginEvent.Error(it.localizedMessage) }
 				).addTo(disposables)
 	}
 
-	sealed class LoginState {
-		object Success : LoginState()
-		class Error(val error: String) : LoginState()
+	sealed class LoginEvent {
+		object LogIn : LoginEvent()
+		class Error(val error: String) : LoginEvent()
 	}
 
 }
