@@ -25,8 +25,8 @@ class UserInteractor(
 
 	override fun logIn(email: String, password: String, isLoginRememberable: Boolean): Single<User> {
 		return when {
-			email.isBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_email)) }
-			password.isEmpty() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
+			email.isBlank() -> Single.error(Exception(context.getString(R.string.enter_email)))
+			password.isEmpty() -> Single.error(Exception(context.getString(R.string.enter_password)))
 			else -> {
 				val apiKey = context.getString(R.string.api_key)
 				val userRequest = UserRequest(email, password)
@@ -42,8 +42,8 @@ class UserInteractor(
 
 	override fun register(email: String, password: String, repeatedPassword: String): Single<User> {
 		return when {
-			email.isBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_email)) }
-			password.isBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
+			email.isBlank() -> Single.error(Exception(context.getString(R.string.enter_email)))
+			password.isBlank() -> Single.error(Exception(context.getString(R.string.enter_password)))
 			password != repeatedPassword -> Single.error(Exception(context.getString(R.string.entered_passwords_do_not_match)))
 			else -> {
 				val apiKey = context.getString(R.string.api_key)
