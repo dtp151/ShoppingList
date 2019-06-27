@@ -1,4 +1,4 @@
-package pl.developit.shoppinglist.presentation.screens.login
+package pl.developit.shoppinglist.presentation.screens.register
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,60 +9,50 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import org.koin.android.viewmodel.ext.android.viewModel
 import pl.developit.shoppinglist.R
-import pl.developit.shoppinglist.databinding.FragmentLoginBinding
+import pl.developit.shoppinglist.databinding.FragmentRegisterBinding
 import pl.developit.shoppinglist.presentation.utils.BaseFragment
 import pl.developit.shoppinglist.presentation.utils.BundleDelegate
 
-class LoginFragment : BaseFragment(), LoginListener {
+class RegisterFragment : BaseFragment(), RegisterListener {
 
 	private var Bundle.email by BundleDelegate.String("email")
-	private var Bundle.password by BundleDelegate.String("password")
 
-	private val viewModel by viewModel<LoginViewModel>()
-
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		setHasOptionsMenu(false)
-	}
+	private val viewModel by viewModel<RegisterViewModel>()
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-		val binding = DataBindingUtil.inflate<FragmentLoginBinding>(inflater, R.layout.fragment_login, container, false).also {
+		val binding = DataBindingUtil.inflate<FragmentRegisterBinding>(inflater, R.layout.fragment_register, container, false).also {
 			it.lifecycleOwner = this
 			it.listener = this
 			it.viewModel = viewModel
 		}
 
-		viewModel.liveState.observe(this, Observer {
+		viewModel.liveEvent.observe(this, Observer {
 			when (it) {
-				is LoginViewModel.LoginState.Success -> mainCommunicator.showShoppingFragment()
-				is LoginViewModel.LoginState.Error -> showError(it.error)
+				is RegisterViewModel.RegisterEvent.Registration -> mainCommunicator.showShoppingFragment()
+				is RegisterViewModel.RegisterEvent.Error -> showError(it.error)
 			}
 		})
+
 		return binding.root
 	}
 
 	override fun onSaveInstanceState(outState: Bundle) {
 		super.onSaveInstanceState(outState)
 		viewModel.email.value?.let { email -> outState.email = email }
-		viewModel.password.value?.let { password -> outState.password = password }
 	}
 
 	override fun onViewStateRestored(savedInstanceState: Bundle?) {
 		super.onViewStateRestored(savedInstanceState)
-		savedInstanceState?.let {
-			viewModel.email.value = it.email
-			viewModel.password.value = it.password
-		}
+		savedInstanceState?.let { viewModel.email.value = it.email }
 	}
 
-	override fun onLoginBtnClick() {
-		viewModel.logIn()
+	override fun onRegisterBtnClick(email: String, password: String, repeatedPassword: String) {
+		viewModel.register(email, password, repeatedPassword)
 	}
 
-	override fun onRegisterBtnClick() {
-		mainCommunicator.showRegisterFragment()
+	override fun onGoToLoginBtnClick() {
+		mainCommunicator.showLoginFragment()
 	}
 
 	private fun showError(error: String) = Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-
 }

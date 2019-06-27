@@ -6,7 +6,7 @@ import pl.developit.shoppinglist.data.models.User
 interface UserUseCases {
 	fun logIn(isLoginRememberable: Boolean?, email: String?, password: String?): Single<User>
 
-	fun register(email: String?, password: String?): Single<User>
+	fun register(email: String, password: String, repeatedPassword: String): Single<User>
 
 	fun getUid(): String
 

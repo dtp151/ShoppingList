@@ -32,22 +32,27 @@ class UserInteractor(
 				val apiKey = context.getString(R.string.api_key)
 				val userRequest = UserRequest(email, password)
 				userInterface.logIn(apiKey, userRequest)
-						.doOnSuccess { updateLogInData(it, isLoginRememberable, email, password) }
+						.doOnSuccess {
+							updateLogInData(it, isLoginRememberable)
+							attemptRememberableUpdate(email, password)
+						}
 						.onErrorResumeNext { Single.error(apiErrorParser.parse(it)) }
 			}
 		}
 	}
 
-	override fun register(email: String?, password: String?): Single<User> {
+	override fun register(email: String, password: String, repeatedPassword: String): Single<User> {
 		return when {
-			email.isNullOrBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_email)) }
-			password.isNullOrEmpty() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
+			email.isBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_email)) }
+			password.isBlank() -> Single.fromCallable { throw Exception(context.getString(R.string.enter_password)) }
+			password != repeatedPassword -> Single.error(Exception(context.getString(R.string.entered_passwords_do_not_match)))
 			else -> {
 				val apiKey = context.getString(R.string.api_key)
 				val userRequest = UserRequest(email, password)
 				userInterface.register(apiKey, userRequest)
 						.doOnSuccess {
-							sharedPrefs.uid = it?.uid
+							updateLogInData(it, true)
+							attemptRememberableUpdate(email, password)
 						}
 						.onErrorResumeNext { Single.error(apiErrorParser.parse(it)) }
 			}
@@ -68,13 +73,12 @@ class UserInteractor(
 		sharedPrefs.uid = ""
 	}
 
-	private fun updateLogInData(user: User, isLoginRememberable: Boolean, email: String, password: String) {
+	private fun updateLogInData(user: User, isLoginRememberable: Boolean) {
 		sharedPrefs.uid = user.uid
 		sharedPrefs.isLogInRememberable = isLoginRememberable
-		updateRememberable(email, password)
 	}
 
-	private fun updateRememberable(email: String, password: String) {
+	private fun attemptRememberableUpdate(email: String, password: String) {
 		if (sharedPrefs.isLogInRememberable) {
 			sharedPrefs.email = email
 			sharedPrefs.password = password

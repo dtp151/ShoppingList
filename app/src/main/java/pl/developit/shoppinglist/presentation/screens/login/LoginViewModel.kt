@@ -36,18 +36,6 @@ class LoginViewModel(private val userUseCases: UserUseCases) : ViewModel() {
 				).addTo(disposables)
 	}
 
-	fun register() {
-		userUseCases.register(email.value, password.value)
-				.subscribeOn(Schedulers.io())
-				.observeOn(AndroidSchedulers.mainThread())
-				.doOnSubscribe { isLoading.value = true }
-				.doFinally { isLoading.value = false }
-				.subscribe(
-						{ liveState.value = LoginState.Success },
-						{ liveState.value = LoginState.Error(it.localizedMessage) }
-				).addTo(disposables)
-	}
-
 	sealed class LoginState {
 		object Success : LoginState()
 		class Error(val error: String) : LoginState()

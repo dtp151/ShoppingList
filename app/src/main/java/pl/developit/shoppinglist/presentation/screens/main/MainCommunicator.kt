@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import pl.developit.shoppinglist.R
 import pl.developit.shoppinglist.presentation.screens.login.LoginFragment
+import pl.developit.shoppinglist.presentation.screens.register.RegisterFragment
 import pl.developit.shoppinglist.presentation.screens.shopping.ShoppingFragment
 
 interface MainCommunicator {
@@ -15,6 +16,10 @@ interface MainCommunicator {
 
 	fun showLoginFragment() {
 		showFragment(LoginFragment())
+	}
+
+	fun showRegisterFragment() {
+		showFragment(RegisterFragment())
 	}
 
 	fun showShoppingFragment() {

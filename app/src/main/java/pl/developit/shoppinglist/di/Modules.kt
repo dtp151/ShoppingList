@@ -15,12 +15,14 @@ import pl.developit.shoppinglist.domain.ProductUseCases
 import pl.developit.shoppinglist.domain.UserInteractor
 import pl.developit.shoppinglist.domain.UserUseCases
 import pl.developit.shoppinglist.presentation.screens.login.LoginViewModel
+import pl.developit.shoppinglist.presentation.screens.register.RegisterViewModel
 import pl.developit.shoppinglist.presentation.screens.shopping.ShoppingFragment
 import pl.developit.shoppinglist.presentation.screens.shopping.ShoppingViewModel
 import pl.developit.shoppinglist.presentation.utils.ApiErrorParser
 
 val viewModelFactoryModule = module {
 	viewModel { LoginViewModel(get()) }
+	viewModel { RegisterViewModel(get()) }
 	viewModel { ShoppingViewModel(get(), get()) }
 }
 
